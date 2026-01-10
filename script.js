@@ -829,7 +829,7 @@ async function handlePaymentSuccess(paymentReference, totalAmount, paystackRespo
         
     } catch (error) {
         console.error('❌ Error in payment processing:', error);
-        showNotification('Payment successful but there was an error saving your order. Please contact support with reference: ' + paymentReference);
+        // showNotification('Payment successful but there was an error saving your order. Please contact support with reference: ' + paymentReference);
     }
 }
 
