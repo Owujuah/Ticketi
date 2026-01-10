@@ -366,7 +366,7 @@ function processPayment() {
     showNotification('Processing payment...');
     
     // In production, replace with your actual Paystack public key
-    const paystackPublicKey = 'pk_test_9919223f9c2ce89545b15367cdb79e64dab0f96d';
+    const paystackPublicKey = 'pk_live_322c5190247dd9f132100d38c74eac8a55ef1b42';
     
     // Create Paystack handler
     const handler = PaystackPop.setup({
