@@ -104,7 +104,7 @@
                         </div>
                     </div>
                     <div class="ticket-footer">
-                        <button class="btn btn-primary add-to-cart" data-name="Regular Ticket" data-price="3000">
+                        <button class="btn btn-primary add-to-cart" data-name="Regular Ticket" data-price="3000" data-type="ticket">
                             <i class="fas fa-cart-plus"></i> Add to Cart
                         </button>
                     </div>
@@ -136,7 +136,7 @@
                         </div>
                     </div>
                     <div class="ticket-footer">
-                        <button class="btn btn-primary add-to-cart" data-name="VIP Ticket" data-price="7000">
+                        <button class="btn btn-primary add-to-cart" data-name="VIP Ticket" data-price="7000" data-type="ticket">
                             <i class="fas fa-cart-plus"></i> Add to Cart
                         </button>
                     </div>
@@ -170,7 +170,7 @@
                                 <span>Dedicated server</span>
                             </div>
                         </div>
-                        <button class="btn btn-outline add-to-cart" data-name="Standard Table" data-price="150000">
+                        <button class="btn btn-outline add-to-cart" data-name="Standard Table" data-price="150000" data-type="table">
                             <i class="fas fa-chair"></i> Reserve Table
                         </button>
                     </div>
@@ -193,7 +193,7 @@
                                 <span>VIP area access</span>
                             </div>
                         </div>
-                        <button class="btn btn-outline add-to-cart" data-name="Premium Table" data-price="300000">
+                        <button class="btn btn-outline add-to-cart" data-name="Premium Table" data-price="300000" data-type="table">
                             <i class="fas fa-chair"></i> Reserve Table
                         </button>
                     </div>
@@ -216,7 +216,7 @@
                                 <span>Personal concierge</span>
                             </div>
                         </div>
-                        <button class="btn btn-primary add-to-cart" data-name="Executive Table" data-price="500000">
+                        <button class="btn btn-primary add-to-cart" data-name="Executive Table" data-price="500000" data-type="table">
                             <i class="fas fa-crown"></i> Reserve Table
                         </button>
                     </div>
@@ -243,7 +243,7 @@
                                 <span>Full bottle service</span>
                             </div>
                         </div>
-                        <button class="btn btn-outline add-to-cart" data-name="Platinum Table" data-price="1000000">
+                        <button class="btn btn-outline add-to-cart" data-name="Platinum Table" data-price="1000000" data-type="table">
                             <i class="fas fa-gem"></i> Reserve Table
                         </button>
                     </div>
@@ -295,24 +295,26 @@
                     </div>
                     
                     <button class="btn btn-primary checkout-btn" id="checkoutBtn" disabled>
-                        <i class="fas fa-lock"></i> Proceed to Secure Checkout
+                        <i class="fas fa-lock"></i> Proceed to Checkout
                     </button>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- IMPROVED CHECKOUT MODAL -->
+    <!-- IMPROVED CHECKOUT MODAL WITH SMALLER HEADER -->
     <div class="modal-overlay" id="modalOverlay"></div>
     
     <div class="checkout-modal" id="checkoutModal">
-        <div class="modal-header">
+        <div class="modal-header compact">
             <span class="close-modal" id="closeModal">&times;</span>
-            <div class="modal-icon">
+            <div class="modal-icon-small">
                 <i class="fas fa-lock"></i>
             </div>
-            <h2 class="modal-title">Secure Checkout</h2>
-            <p class="modal-subtitle">Complete your purchase in 3 simple steps</p>
+            <div class="modal-header-content">
+                <h3 class="modal-title-small">Complete Your Purchase</h3>
+                <p class="modal-subtitle-small">Secure checkout with Paystack</p>
+            </div>
         </div>
         
         <div class="modal-body">
@@ -320,11 +322,11 @@
             <div class="form-steps">
                 <div class="step active" id="step1">
                     <div class="step-circle">1</div>
-                    <div class="step-label">Personal Info</div>
+                    <div class="step-label">Your Info</div>
                 </div>
                 <div class="step" id="step2">
                     <div class="step-circle">2</div>
-                    <div class="step-label">Order Review</div>
+                    <div class="step-label">Order Details</div>
                 </div>
                 <div class="step" id="step3">
                     <div class="step-circle">3</div>
@@ -334,28 +336,28 @@
             
             <!-- Step 1: Personal Information -->
             <div class="form-step active" id="step1Form">
-                <h3 class="step-title">Personal Information</h3>
+                <h4 class="step-title">Contact Information</h4>
                 
                 <div class="form-grid">
                     <div class="form-group full-width">
                         <label class="form-label">Full Name <span class="required">*</span></label>
-                        <input type="text" class="form-input" id="fullName" placeholder="Enter your full name" required>
+                        <input type="text" class="form-input" id="fullName" placeholder="John Doe" required>
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Email Address <span class="required">*</span></label>
-                        <input type="email" class="form-input" id="email" placeholder="you@example.com" required>
+                        <label class="form-label">Email <span class="required">*</span></label>
+                        <input type="email" class="form-input" id="email" placeholder="john@example.com" required>
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Phone Number <span class="required">*</span></label>
+                        <label class="form-label">Phone <span class="required">*</span></label>
                         <input type="tel" class="form-input" id="phone" placeholder="+234 800 000 0000" required>
                     </div>
                 </div>
                 
                 <div class="modal-actions">
                     <button type="button" class="btn-back" id="closeCheckoutBtn">
-                        <i class="fas fa-times"></i> Cancel
+                        Cancel
                     </button>
                     <button type="button" class="btn-next" id="nextToStep2">
                         Continue <i class="fas fa-arrow-right"></i>
@@ -365,20 +367,20 @@
             
             <!-- Step 2: Order Review -->
             <div class="form-step" id="step2Form">
-                <h3 class="step-title">Order Review</h3>
+                <h4 class="step-title">Order Summary</h4>
                 
                 <div class="order-summary-box" id="orderSummaryBox">
                     <!-- Order summary will be populated here -->
                 </div>
                 
                 <div class="form-group full-width">
-                    <label class="form-label">Special Instructions (Optional)</label>
-                    <textarea class="form-input" id="specialInstructions" placeholder="Any special requests or instructions for your order..." rows="3"></textarea>
+                    <label class="form-label">Special Requests (Optional)</label>
+                    <textarea class="form-input" id="specialInstructions" placeholder="Any special requests for your order..." rows="2"></textarea>
                 </div>
                 
                 <div class="security-badge">
                     <i class="fas fa-shield-alt"></i>
-                    <span>Your payment is secured with Paystack</span>
+                    <span>Secured by Paystack</span>
                 </div>
                 
                 <div class="modal-actions">
@@ -386,19 +388,19 @@
                         <i class="fas fa-arrow-left"></i> Back
                     </button>
                     <button type="button" class="btn-next" id="nextToStep3">
-                        Continue <i class="fas fa-arrow-right"></i>
+                        Continue to Payment <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
             </div>
             
             <!-- Step 3: Payment -->
             <div class="form-step" id="step3Form">
-                <h3 class="step-title">Payment Details</h3>
+                <h4 class="step-title">Payment Method</h4>
                 
                 <div class="payment-methods">
-                    <div class="payment-method" data-method="card">
+                    <div class="payment-method selected" data-method="card">
                         <i class="fas fa-credit-card"></i>
-                        <span>Credit/Debit Card</span>
+                        <span>Card Payment</span>
                     </div>
                     <div class="payment-method" data-method="bank">
                         <i class="fas fa-university"></i>
@@ -468,7 +470,7 @@
                 <div>
                     <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 24px; color: white;">Event Details</h3>
                     <ul style="list-style: none;">
-                        <li style="margin-bottom: 16px;"><a href="#" style="color: rgba(255,255,255,0.7); text-decoration: none;"><i class="far fa-calendar-alt"></i> December 15, 2023</a></li>
+                        <li style="margin-bottom: 16px;"><a href="#" style="color: rgba(255,255,255,0.7); text-decoration: none;"><i class="far fa-calendar-alt"></i> December 15, 2026</a></li>
                         <li style="margin-bottom: 16px;"><a href="#" style="color: rgba(255,255,255,0.7); text-decoration: none;"><i class="far fa-clock"></i> 7:00 PM - 2:00 AM</a></li>
                         <li style="margin-bottom: 16px;"><a href="#" style="color: rgba(255,255,255,0.7); text-decoration: none;"><i class="fas fa-map-marker-alt"></i> Grand Arena, Lagos</a></li>
                     </ul>
@@ -489,695 +491,7 @@
             </div>
         </div>
     </footer>
+    
     <script src="script.js"></script>
-    <script>
-        // ============================================
-        // FIREBASE CONFIGURATION
-        // ============================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyCfjv99aMtQsXs0DQhQPw6eebBQeL65UsY",
-            authDomain: "ticket-b593e.firebaseapp.com",
-            projectId: "ticket-b593e",
-            storageBucket: "ticket-b593e.firebasestorage.app",
-            messagingSenderId: "591348153786",
-            appId: "1:591348153786:web:d2131cabfaca5280dbb183",
-            measurementId: "G-Z3EWKN2PJM"
-        };
-
-        // Initialize Firebase
-        let db;
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            console.log("Firebase initialized successfully");
-        } catch (error) {
-            console.error("Firebase initialization error:", error);
-        }
-
-        // ============================================
-        // APPLICATION STATE
-        // ============================================
-        let cart = JSON.parse(localStorage.getItem('straightOuttaUniCart')) || [];
-        let checkoutData = {
-            customer: {},
-            paymentMethod: 'card',
-            ticketIds: []
-        };
-        let currentStep = 1;
-
-        // ============================================
-        // DOM ELEMENTS
-        // ============================================
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const navMenu = document.getElementById('navMenu');
-        const cartButton = document.getElementById('cartButton');
-        const cartCount = document.getElementById('cartCount');
-        const cartItems = document.getElementById('cartItems');
-        const cartEmpty = document.getElementById('cartEmpty');
-        const cartTotalItems = document.getElementById('cartTotalItems');
-        const cartSubtotal = document.getElementById('cartSubtotal');
-        const cartServiceFee = document.getElementById('cartServiceFee');
-        const cartTotal = document.getElementById('cartTotal');
-        const checkoutBtn = document.getElementById('checkoutBtn');
-        const modalOverlay = document.getElementById('modalOverlay');
-        const checkoutModal = document.getElementById('checkoutModal');
-        const closeModal = document.getElementById('closeModal');
-        const closeCheckoutBtn = document.getElementById('closeCheckoutBtn');
-        
-        // Form elements
-        const steps = document.querySelectorAll('.step');
-        const formSteps = document.querySelectorAll('.form-step');
-        const paymentMethods = document.querySelectorAll('.payment-method');
-        
-        // Navigation buttons
-        const nextToStep2Btn = document.getElementById('nextToStep2');
-        const backToStep1Btn = document.getElementById('backToStep1');
-        const nextToStep3Btn = document.getElementById('nextToStep3');
-        const backToStep2Btn = document.getElementById('backToStep2');
-        const processPaymentBtn = document.getElementById('processPaymentBtn');
-        const finishBtn = document.getElementById('finishBtn');
-        
-        // Input fields
-        const fullNameInput = document.getElementById('fullName');
-        const emailInput = document.getElementById('email');
-        const phoneInput = document.getElementById('phone');
-        const orderSummaryBox = document.getElementById('orderSummaryBox');
-        const paymentDetails = document.getElementById('paymentDetails');
-
-        // ============================================
-        // INITIALIZATION
-        // ============================================
-        function init() {
-            updateCartDisplay();
-            setupEventListeners();
-        }
-
-        // ============================================
-        // EVENT LISTENERS SETUP
-        // ============================================
-        function setupEventListeners() {
-            // Mobile menu
-            mobileMenuBtn.addEventListener('click', () => {
-                navMenu.classList.toggle('active');
-            });
-
-            // Close mobile menu when clicking a link
-            document.querySelectorAll('#navMenu a').forEach(link => {
-                link.addEventListener('click', () => {
-                    navMenu.classList.remove('active');
-                });
-            });
-
-            // Cart button
-            cartButton.addEventListener('click', () => {
-                document.getElementById('cart').scrollIntoView({ behavior: 'smooth' });
-            });
-
-            // Add to cart buttons
-            document.querySelectorAll('.add-to-cart').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const name = e.target.getAttribute('data-name') || e.target.closest('.add-to-cart').getAttribute('data-name');
-                    const price = parseInt(e.target.getAttribute('data-price') || e.target.closest('.add-to-cart').getAttribute('data-price'));
-                    addToCart(name, price);
-                });
-            });
-
-            // Checkout button
-            checkoutBtn.addEventListener('click', openCheckoutModal);
-
-            // Close modal buttons
-            closeModal.addEventListener('click', closeCheckoutModal);
-            closeCheckoutBtn.addEventListener('click', closeCheckoutModal);
-            modalOverlay.addEventListener('click', closeCheckoutModal);
-
-            // Form navigation
-            nextToStep2Btn.addEventListener('click', goToStep2);
-            backToStep1Btn.addEventListener('click', () => goToStep(1));
-            nextToStep3Btn.addEventListener('click', goToStep3);
-            backToStep2Btn.addEventListener('click', () => goToStep(2));
-            
-            // Payment method selection
-            paymentMethods.forEach(method => {
-                method.addEventListener('click', () => {
-                    paymentMethods.forEach(m => m.classList.remove('selected'));
-                    method.classList.add('selected');
-                    checkoutData.paymentMethod = method.getAttribute('data-method');
-                });
-            });
-
-            // Process payment
-            processPaymentBtn.addEventListener('click', processPayment);
-            
-            // Finish button
-            finishBtn.addEventListener('click', closeCheckoutModal);
-
-            // Smooth scrolling
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href');
-                    if (targetId === '#') return;
-                    
-                    const targetElement = document.querySelector(targetId);
-                    if (targetElement) {
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 80,
-                            behavior: 'smooth'
-                        });
-                    }
-                });
-            });
-        }
-
-        // ============================================
-        // CART FUNCTIONS
-        // ============================================
-        function addToCart(name, price) {
-            const existingItem = cart.find(item => item.name === name);
-            
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                cart.push({ name, price, quantity: 1 });
-            }
-            
-            saveCart();
-            updateCartDisplay();
-            showNotification(`${name} added to cart!`);
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            saveCart();
-            updateCartDisplay();
-            showNotification('Item removed from cart');
-        }
-
-        function updateQuantity(index, change) {
-            const newQuantity = cart[index].quantity + change;
-            
-            if (newQuantity < 1) {
-                removeFromCart(index);
-            } else {
-                cart[index].quantity = newQuantity;
-                saveCart();
-                updateCartDisplay();
-            }
-        }
-
-        function saveCart() {
-            localStorage.setItem('straightOuttaUniCart', JSON.stringify(cart));
-        }
-
-        function updateCartDisplay() {
-            // Update cart count
-            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-            cartCount.textContent = totalItems;
-            cartTotalItems.textContent = `${totalItems} ${totalItems === 1 ? 'item' : 'items'}`;
-            
-            // Calculate totals
-            const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-            const serviceFee = Math.round(subtotal * 0.05);
-            const total = subtotal + serviceFee;
-            
-            cartSubtotal.textContent = `₦${subtotal.toLocaleString()}`;
-            cartServiceFee.textContent = `₦${serviceFee.toLocaleString()}`;
-            cartTotal.textContent = `₦${total.toLocaleString()}`;
-            
-            // Enable/disable checkout button
-            checkoutBtn.disabled = cart.length === 0;
-            
-            // Update cart items display
-            if (cart.length === 0) {
-                cartItems.innerHTML = '';
-                cartItems.appendChild(cartEmpty);
-            } else {
-                cartEmpty.remove();
-                
-                let cartHTML = '';
-                cart.forEach((item, index) => {
-                    cartHTML += `
-                        <div class="cart-item">
-                            <div class="item-name">${item.name}</div>
-                            <div class="item-price">₦${(item.price * item.quantity).toLocaleString()}</div>
-                            <div class="item-quantity">
-                                <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">-</button>
-                                <span class="quantity">${item.quantity}</span>
-                                <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
-                            </div>
-                            <button class="item-remove" onclick="removeFromCart(${index})">
-                                <i class="fas fa-trash"></i> Remove
-                            </button>
-                        </div>
-                    `;
-                });
-                
-                cartItems.innerHTML = cartHTML;
-            }
-        }
-
-        // ============================================
-        // CHECKOUT MODAL FUNCTIONS
-        // ============================================
-        function openCheckoutModal() {
-            if (cart.length === 0) {
-                showNotification('Your cart is empty');
-                return;
-            }
-            
-            // Reset form
-            fullNameInput.value = '';
-            emailInput.value = '';
-            phoneInput.value = '';
-            document.getElementById('specialInstructions').value = '';
-            paymentMethods.forEach(m => m.classList.remove('selected'));
-            document.querySelector('.payment-method[data-method="card"]').classList.add('selected');
-            checkoutData.paymentMethod = 'card';
-            
-            modalOverlay.style.display = 'block';
-            checkoutModal.style.display = 'block';
-            
-            setTimeout(() => {
-                modalOverlay.classList.add('active');
-                checkoutModal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }, 10);
-            
-            goToStep(1);
-        }
-
-        function closeCheckoutModal() {
-            modalOverlay.classList.remove('active');
-            checkoutModal.classList.remove('active');
-            
-            setTimeout(() => {
-                modalOverlay.style.display = 'none';
-                checkoutModal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }, 300);
-        }
-
-        function goToStep(stepNumber) {
-            // Update steps
-            steps.forEach(step => step.classList.remove('active', 'completed'));
-            
-            for (let i = 1; i <= stepNumber; i++) {
-                const step = document.getElementById(`step${i}`);
-                if (i < stepNumber) {
-                    step.classList.add('completed');
-                } else {
-                    step.classList.add('active');
-                }
-            }
-            
-            // Show form step
-            formSteps.forEach(form => form.classList.remove('active'));
-            document.getElementById(`step${stepNumber}Form`).classList.add('active');
-            
-            currentStep = stepNumber;
-            
-            // Scroll to top of modal
-            checkoutModal.scrollTop = 0;
-        }
-
-        function goToStep2() {
-            // Validate step 1
-            if (!fullNameInput.value.trim()) {
-                showNotification('Please enter your full name');
-                fullNameInput.focus();
-                return;
-            }
-            
-            if (!emailInput.value.trim()) {
-                showNotification('Please enter your email address');
-                emailInput.focus();
-                return;
-            }
-            
-            // Basic email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(emailInput.value)) {
-                showNotification('Please enter a valid email address');
-                emailInput.focus();
-                return;
-            }
-            
-            if (!phoneInput.value.trim()) {
-                showNotification('Please enter your phone number');
-                phoneInput.focus();
-                return;
-            }
-            
-            // Save customer data
-            checkoutData.customer = {
-                name: fullNameInput.value.trim(),
-                email: emailInput.value.trim(),
-                phone: phoneInput.value.trim(),
-                timestamp: new Date().toISOString()
-            };
-            
-            // Update order summary
-            updateOrderSummary();
-            
-            goToStep(2);
-        }
-
-        function goToStep3() {
-            updateOrderSummary();
-            goToStep(3);
-        }
-
-        function updateOrderSummary() {
-            const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-            const serviceFee = Math.round(subtotal * 0.05);
-            const total = subtotal + serviceFee;
-            
-            let summaryHTML = '';
-            
-            cart.forEach(item => {
-                summaryHTML += `
-                    <div class="order-item">
-                        <span>${item.name} × ${item.quantity}</span>
-                        <span>₦${(item.price * item.quantity).toLocaleString()}</span>
-                    </div>
-                `;
-            });
-            
-            summaryHTML += `
-                <div class="order-item">
-                    <span>Subtotal</span>
-                    <span>₦${subtotal.toLocaleString()}</span>
-                </div>
-                <div class="order-item">
-                    <span>Service Fee (5%)</span>
-                    <span>₦${serviceFee.toLocaleString()}</span>
-                </div>
-                <div class="order-item order-total">
-                    <span>Total Amount</span>
-                    <span>₦${total.toLocaleString()}</span>
-                </div>
-            `;
-            
-            orderSummaryBox.innerHTML = summaryHTML;
-        }
-
-        // ============================================
-        // FIREBASE FUNCTIONS - IMPROVED VERSION
-        // ============================================
-        async function saveCustomerToFirestore(customerData, orderData, paymentReference) {
-            try {
-                console.log("Starting to save to Firestore...");
-                console.log("Customer Data:", customerData);
-                console.log("Order Data:", orderData);
-                console.log("Cart:", cart);
-                
-                // Generate ticket IDs for each item in cart
-                const ticketIds = [];
-                const purchasedItems = [];
-                
-                // Process each item in the cart
-                for (const item of cart) {
-                    // Generate a unique ticket ID for each quantity
-                    for (let i = 0; i < item.quantity; i++) {
-                        const ticketId = `SOU-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-                        ticketIds.push(ticketId);
-                        
-                        // Create individual ticket purchase record
-                        const ticketPurchase = {
-                            ticketId: ticketId,
-                            customerName: customerData.name,
-                            customerEmail: customerData.email,
-                            customerPhone: customerData.phone,
-                            ticketType: item.name,
-                            ticketPrice: item.price,
-                            purchaseDate: firebase.firestore.FieldValue.serverTimestamp(),
-                            paymentReference: paymentReference,
-                            status: 'valid',
-                            eventDate: '2026-12-15',
-                            eventTime: '19:00',
-                            eventLocation: 'Grand Arena, Lagos',
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                        };
-                        
-                        purchasedItems.push(ticketPurchase);
-                    }
-                }
-                
-                // Save each ticket purchase individually
-                const ticketPromises = purchasedItems.map(ticket => {
-                    return db.collection('ticketPurchases').add(ticket)
-                        .then(docRef => {
-                            console.log('Ticket purchase saved with ID:', docRef.id);
-                            return docRef.id;
-                        })
-                        .catch(error => {
-                            console.error('Error saving ticket purchase:', error);
-                            throw error;
-                        });
-                });
-                
-                // Wait for all ticket purchases to be saved
-                await Promise.all(ticketPromises);
-                
-                // Save the main order document
-                const orderDocument = {
-                    customer: customerData,
-                    items: cart.map(item => ({
-                        name: item.name,
-                        price: item.price,
-                        quantity: item.quantity
-                    })),
-                    orderTotal: orderData.total,
-                    subtotal: orderData.subtotal,
-                    serviceFee: orderData.serviceFee,
-                    paymentReference: paymentReference,
-                    paymentMethod: checkoutData.paymentMethod,
-                    ticketIds: ticketIds,
-                    orderDate: firebase.firestore.FieldValue.serverTimestamp(),
-                    specialInstructions: document.getElementById('specialInstructions').value.trim() || '',
-                    status: 'completed',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                console.log("Saving order document:", orderDocument);
-                
-                // Save to Firestore
-                const docRef = await db.collection('orders').add(orderDocument);
-                
-                console.log('✅ Order saved to Firestore with ID:', docRef.id);
-                return {
-                    orderId: docRef.id,
-                    ticketIds: ticketIds
-                };
-                
-            } catch (error) {
-                console.error('❌ Error saving to Firestore:', error);
-                console.error('Error details:', error.message, error.code);
-                throw error;
-            }
-        }
-
-        // ============================================
-        // PAYMENT PROCESSING
-        // ============================================
-        function processPayment() {
-            if (!checkoutData.paymentMethod) {
-                showNotification('Please select a payment method');
-                return;
-            }
-            
-            // Calculate total
-            const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-            const serviceFee = Math.round(subtotal * 0.05);
-            const total = subtotal + serviceFee;
-            
-            // Validate customer data is available
-            if (!checkoutData.customer || !checkoutData.customer.email) {
-                showNotification('Please fill in your personal information first');
-                goToStep(1);
-                return;
-            }
-            
-            // Show processing notification
-            showNotification('Processing payment...');
-            
-            // Paystack public key - TEST MODE
-            const paystackPublicKey = 'pk_live_322c5190247dd9f132100d38c74eac8a55ef1b42';
-            
-            // Generate a unique reference
-            const reference = `SOU-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
-            
-            console.log("Starting payment with reference:", reference);
-            
-            // Create Paystack handler
-            const handler = PaystackPop.setup({
-                key: paystackPublicKey,
-                email: checkoutData.customer.email,
-                amount: total * 100, // Convert to kobo
-                currency: 'NGN',
-                ref: reference,
-                metadata: {
-                    custom_fields: [
-                        {
-                            display_name: "Customer Name",
-                            variable_name: "customer_name",
-                            value: checkoutData.customer.name
-                        },
-                        {
-                            display_name: "Phone Number",
-                            variable_name: "phone_number",
-                            value: checkoutData.customer.phone
-                        }
-                    ]
-                },
-                callback: async function(response) {
-                    console.log("Payment successful! Response:", response);
-                    
-                    try {
-                        const orderData = {
-                            subtotal: subtotal,
-                            serviceFee: serviceFee,
-                            total: total
-                        };
-                        
-                        // Save to Firestore
-                        console.log("Saving to Firestore...");
-                        const firestoreResult = await saveCustomerToFirestore(
-                            checkoutData.customer, 
-                            orderData, 
-                            response.reference
-                        );
-                        
-                        console.log("Firestore save result:", firestoreResult);
-                        
-                        // Update checkout data with ticket IDs
-                        checkoutData.ticketIds = firestoreResult.ticketIds;
-                        
-                        // Show success message
-                        showPaymentSuccess(response.reference, firestoreResult);
-                        
-                        // Clear cart
-                        cart = [];
-                        saveCart();
-                        updateCartDisplay();
-                        
-                    } catch (error) {
-                        console.error('Error in payment callback:', error);
-                        showNotification('Payment successful but there was an error saving your order. Please contact support with reference: ' + response.reference);
-                        closeCheckoutModal();
-                    }
-                },
-                onClose: function() {
-                    showNotification('Payment was cancelled');
-                }
-            });
-            
-            handler.openIframe();
-        }
-
-        function showPaymentSuccess(reference, firestoreResult) {
-            const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-            const serviceFee = Math.round(subtotal * 0.05);
-            const total = subtotal + serviceFee;
-            
-            // Format ticket IDs for display (show only first 3 for brevity)
-            let ticketIdsDisplay = '';
-            if (checkoutData.ticketIds && checkoutData.ticketIds.length > 0) {
-                const displayedTickets = checkoutData.ticketIds.slice(0, 3);
-                ticketIdsDisplay = displayedTickets.map(id => 
-                    `<div style="margin: 5px 0; font-family: monospace; font-size: 12px;">${id}</div>`
-                ).join('');
-                
-                if (checkoutData.ticketIds.length > 3) {
-                    ticketIdsDisplay += `<div style="margin: 5px 0; color: var(--gray);">+ ${checkoutData.ticketIds.length - 3} more tickets</div>`;
-                }
-            }
-            
-            // Update payment details
-            paymentDetails.innerHTML = `
-                <div style="margin-bottom: 20px;">
-                    <p><strong>Order Reference:</strong> ${reference}</p>
-                    <p><strong>Firestore Order ID:</strong> ${firestoreResult.orderId}</p>
-                    <p><strong>Customer Name:</strong> ${checkoutData.customer.name}</p>
-                    <p><strong>Email:</strong> ${checkoutData.customer.email}</p>
-                    <p><strong>Phone:</strong> ${checkoutData.customer.phone}</p>
-                    <p><strong>Total Paid:</strong> ₦${total.toLocaleString()}</p>
-                    <p><strong>Payment Method:</strong> ${checkoutData.paymentMethod.charAt(0).toUpperCase() + checkoutData.paymentMethod.slice(1)}</p>
-                </div>
-                
-                <div style="background: rgba(220, 38, 38, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
-                    <p style="color: var(--primary); font-weight: bold; margin-bottom: 10px;">🎫 Your Ticket IDs:</p>
-                    ${ticketIdsDisplay}
-                    <p style="color: var(--primary-dark); margin-top: 10px; font-size: 14px;">
-                        <strong>⚠️ Important:</strong> Save your ticket IDs! You'll need them for entry.
-                        Check your email for full details.
-                    </p>
-                </div>
-                
-                <p style="color: var(--success); font-weight: bold; margin-top: 20px;">
-                    ✅ Confirmation email has been sent to ${checkoutData.customer.email}
-                </p>
-            `;
-            
-            // Show success screen
-            goToStep(4);
-        }
-
-        // ============================================
-        // UTILITY FUNCTIONS
-        // ============================================
-        function showNotification(message) {
-            // Create notification
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 80px;
-                right: 20px;
-                background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-                color: white;
-                padding: 16px 24px;
-                border-radius: var(--radius-sm);
-                box-shadow: var(--shadow-lg);
-                z-index: 9999;
-                font-weight: 700;
-                transform: translateX(120%);
-                transition: transform 0.3s ease;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            `;
-            notification.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
-            
-            document.body.appendChild(notification);
-            
-            // Animate in
-            setTimeout(() => {
-                notification.style.transform = 'translateX(0)';
-            }, 10);
-            
-            // Remove after 3 seconds
-            setTimeout(() => {
-                notification.style.transform = 'translateX(120%)';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
-        }
-
-        function scrollToTickets() {
-            document.getElementById('tickets').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // ============================================
-        // INITIALIZE APPLICATION
-        // ============================================
-        document.addEventListener('DOMContentLoaded', init);
-        
-        // Make functions globally available
-        window.addToCart = addToCart;
-        window.removeFromCart = removeFromCart;
-        window.updateQuantity = updateQuantity;
-        window.scrollToTickets = scrollToTickets;
-    </script>
 </body>
 </html>

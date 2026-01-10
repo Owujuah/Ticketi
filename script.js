@@ -1,12 +1,41 @@
-// Cart data
+// ============================================
+// FIREBASE CONFIGURATION
+// ============================================
+const firebaseConfig = {
+    apiKey: "AIzaSyCfjv99aMtQsXs0DQhQPw6eebBQeL65UsY",
+    authDomain: "ticket-b593e.firebaseapp.com",
+    projectId: "ticket-b593e",
+    storageBucket: "ticket-b593e.firebasestorage.app",
+    messagingSenderId: "591348153786",
+    appId: "1:591348153786:web:d2131cabfaca5280dbb183",
+    measurementId: "G-Z3EWKN2PJM"
+};
+
+// Initialize Firebase
+let db;
+try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    console.log("✅ Firebase initialized successfully");
+} catch (error) {
+    console.error("❌ Firebase initialization error:", error);
+}
+
+// ============================================
+// APPLICATION STATE
+// ============================================
 let cart = JSON.parse(localStorage.getItem('straightOuttaUniCart')) || [];
 let checkoutData = {
     customer: {},
-    paymentMethod: 'card'
+    paymentMethod: 'card',
+    ticketIds: [],
+    purchasedItems: []
 };
 let currentStep = 1;
 
-// DOM Elements
+// ============================================
+// DOM ELEMENTS
+// ============================================
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 const navMenu = document.getElementById('navMenu');
 const cartButton = document.getElementById('cartButton');
@@ -43,13 +72,18 @@ const phoneInput = document.getElementById('phone');
 const orderSummaryBox = document.getElementById('orderSummaryBox');
 const paymentDetails = document.getElementById('paymentDetails');
 
-// Initialize
+// ============================================
+// INITIALIZATION
+// ============================================
 function init() {
     updateCartDisplay();
     setupEventListeners();
+    console.log("✅ Application initialized");
 }
 
-// Setup event listeners
+// ============================================
+// EVENT LISTENERS SETUP
+// ============================================
 function setupEventListeners() {
     // Mobile menu
     mobileMenuBtn.addEventListener('click', () => {
@@ -71,9 +105,11 @@ function setupEventListeners() {
     // Add to cart buttons
     document.querySelectorAll('.add-to-cart').forEach(button => {
         button.addEventListener('click', (e) => {
-            const name = e.target.getAttribute('data-name') || e.target.closest('.add-to-cart').getAttribute('data-name');
-            const price = parseInt(e.target.getAttribute('data-price') || e.target.closest('.add-to-cart').getAttribute('data-price'));
-            addToCart(name, price);
+            const target = e.target.closest('.add-to-cart');
+            const name = target.getAttribute('data-name');
+            const price = parseInt(target.getAttribute('data-price'));
+            const type = target.getAttribute('data-type') || 'ticket';
+            addToCart(name, price, type);
         });
     });
 
@@ -124,14 +160,16 @@ function setupEventListeners() {
     });
 }
 
-// Cart functions
-function addToCart(name, price) {
+// ============================================
+// CART FUNCTIONS
+// ============================================
+function addToCart(name, price, type = 'ticket') {
     const existingItem = cart.find(item => item.name === name);
     
     if (existingItem) {
         existingItem.quantity += 1;
     } else {
-        cart.push({ name, price, quantity: 1 });
+        cart.push({ name, price, quantity: 1, type });
     }
     
     saveCart();
@@ -209,7 +247,9 @@ function updateCartDisplay() {
     }
 }
 
-// Checkout modal functions
+// ============================================
+// CHECKOUT MODAL FUNCTIONS
+// ============================================
 function openCheckoutModal() {
     if (cart.length === 0) {
         showNotification('Your cart is empty');
@@ -303,7 +343,8 @@ function goToStep2() {
     checkoutData.customer = {
         name: fullNameInput.value.trim(),
         email: emailInput.value.trim(),
-        phone: phoneInput.value.trim()
+        phone: phoneInput.value.trim(),
+        timestamp: new Date().toISOString()
     };
     
     // Update order summary
@@ -325,16 +366,20 @@ function updateOrderSummary() {
     let summaryHTML = '';
     
     cart.forEach(item => {
+        const itemType = item.type === 'table' ? 'Table' : 'Ticket';
         summaryHTML += `
             <div class="order-item">
-                <span>${item.name} × ${item.quantity}</span>
+                <div>
+                    <strong>${item.name}</strong>
+                    <div style="font-size: 12px; color: var(--text-light);">${itemType} × ${item.quantity}</div>
+                </div>
                 <span>₦${(item.price * item.quantity).toLocaleString()}</span>
             </div>
         `;
     });
     
     summaryHTML += `
-        <div class="order-item">
+        <div class="order-item" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border);">
             <span>Subtotal</span>
             <span>₦${subtotal.toLocaleString()}</span>
         </div>
@@ -351,7 +396,288 @@ function updateOrderSummary() {
     orderSummaryBox.innerHTML = summaryHTML;
 }
 
+// ============================================
+// FIREBASE FUNCTIONS
+// ============================================
+async function saveCustomerToFirestore(customerData, orderData, paymentReference) {
+    try {
+        console.log("🔄 Starting to save to Firestore...");
+        
+        // Generate ticket IDs for each item in cart
+        const ticketIds = [];
+        const purchasedItems = [];
+        
+        // Process each item in the cart
+        for (const item of cart) {
+            // Generate a unique ticket ID for each quantity
+            for (let i = 0; i < item.quantity; i++) {
+                const ticketId = `SOU-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                ticketIds.push(ticketId);
+                
+                // Create individual ticket purchase record with TYPE included
+                const ticketPurchase = {
+                    ticketId: ticketId,
+                    customerName: customerData.name,
+                    customerEmail: customerData.email,
+                    customerPhone: customerData.phone,
+                    ticketType: item.name,
+                    ticketPrice: item.price,
+                    purchaseDate: firebase.firestore.FieldValue.serverTimestamp(),
+                    paymentReference: paymentReference,
+                    status: 'valid',
+                    eventDate: '2026-12-15',
+                    eventTime: '19:00',
+                    eventLocation: 'Grand Arena, Lagos',
+                    itemType: item.type,
+                    quantity: 1,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                purchasedItems.push(ticketPurchase);
+            }
+        }
+        
+        // Save each ticket purchase individually
+        const ticketPromises = purchasedItems.map(ticket => {
+            return db.collection('ticketPurchases').add(ticket)
+                .then(docRef => {
+                    console.log('Ticket purchase saved with ID:', docRef.id);
+                    return docRef.id;
+                })
+                .catch(error => {
+                    console.error('Error saving ticket purchase:', error);
+                    throw error;
+                });
+        });
+        
+        // Wait for all ticket purchases to be saved
+        await Promise.all(ticketPromises);
+        
+        // Save the main order document
+        const orderDocument = {
+            customer: customerData,
+            items: cart.map(item => ({
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                type: item.type
+            })),
+            orderTotal: orderData.total,
+            subtotal: orderData.subtotal,
+            serviceFee: orderData.serviceFee,
+            paymentReference: paymentReference,
+            paymentMethod: checkoutData.paymentMethod,
+            ticketIds: ticketIds,
+            orderDate: firebase.firestore.FieldValue.serverTimestamp(),
+            specialInstructions: document.getElementById('specialInstructions').value.trim() || '',
+            status: 'completed',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        console.log("Saving order document:", orderDocument);
+        
+        // Save to Firestore
+        const docRef = await db.collection('orders').add(orderDocument);
+        
+        console.log('✅ Order saved to Firestore with ID:', docRef.id);
+        
+        // Store purchased items for email sending
+        checkoutData.purchasedItems = cart.map(item => ({
+            name: item.name,
+            type: item.type,
+            price: item.price,
+            quantity: item.quantity
+        }));
+        
+        return {
+            orderId: docRef.id,
+            ticketIds: ticketIds,
+            purchasedItems: cart.map(item => ({
+                name: item.name,
+                type: item.type,
+                price: item.price,
+                quantity: item.quantity
+            }))
+        };
+        
+    } catch (error) {
+        console.error('❌ Error saving to Firestore:', error);
+        throw error;
+    }
+}
+
+// ============================================
+// SEND EMAIL FUNCTION
+// ============================================
+async function sendConfirmationEmail(customerData, orderData, paymentReference, firestoreResult) {
+    try {
+        // Prepare email content with ticket type details
+        const emailContent = {
+            to: customerData.email,
+            message: {
+                subject: `🎫 Straight Outta Uni - Order Confirmation #${paymentReference}`,
+                html: generateEmailHTML(customerData, orderData, paymentReference, firestoreResult),
+                text: generateEmailText(customerData, orderData, paymentReference, firestoreResult)
+            }
+        };
+        
+        // Save email to Firestore for backend processing
+        await db.collection('emailQueue').add({
+            ...emailContent,
+            status: 'pending',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            customerName: customerData.name,
+            orderId: firestoreResult.orderId
+        });
+        
+        console.log('✅ Email queued for sending');
+        
+    } catch (error) {
+        console.error('❌ Error queuing email:', error);
+        // Don't throw error - email sending shouldn't block payment
+    }
+}
+
+function generateEmailHTML(customerData, orderData, paymentReference, firestoreResult) {
+    const subtotal = orderData.subtotal;
+    const serviceFee = orderData.serviceFee;
+    const total = orderData.total;
+    
+    let itemsHTML = '';
+    firestoreResult.purchasedItems.forEach(item => {
+        const itemType = item.type === 'table' ? 'Table Reservation' : 'Ticket';
+        itemsHTML += `
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                    <strong>${item.name}</strong><br>
+                    <small>${itemType} × ${item.quantity}</small>
+                </td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">
+                    ₦${(item.price * item.quantity).toLocaleString()}
+                </td>
+            </tr>
+        `;
+    });
+    
+    return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body { font-family: 'Inter', Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                .content { background: #fff; padding: 30px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 10px 10px; }
+                .ticket-id { background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; font-family: monospace; font-size: 14px; }
+                .total-box { background: #f0fdf4; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #22c55e; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1 style="margin: 0; font-size: 28px;">🎓 Straight Outta Uni</h1>
+                    <p style="opacity: 0.9; margin: 10px 0 0;">Order Confirmation</p>
+                </div>
+                
+                <div class="content">
+                    <h2>Thank You for Your Purchase, ${customerData.name}!</h2>
+                    <p>Your order has been confirmed and your tickets have been reserved.</p>
+                    
+                    <h3>📋 Order Details</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        ${itemsHTML}
+                    </table>
+                    
+                    <div class="total-box">
+                        <h4 style="margin: 0 0 10px 0; color: #166534;">Order Summary</h4>
+                        <p style="margin: 5px 0;"><strong>Subtotal:</strong> ₦${subtotal.toLocaleString()}</p>
+                        <p style="margin: 5px 0;"><strong>Service Fee (5%):</strong> ₦${serviceFee.toLocaleString()}</p>
+                        <p style="margin: 10px 0; font-size: 18px; font-weight: bold; color: #166534;">Total: ₦${total.toLocaleString()}</p>
+                    </div>
+                    
+                    <h3>🎫 Your Ticket Information</h3>
+                    <p>Your ticket IDs have been generated and are ready for use:</p>
+                    ${firestoreResult.ticketIds.slice(0, 3).map(id => `
+                        <div class="ticket-id">${id}</div>
+                    `).join('')}
+                    ${firestoreResult.ticketIds.length > 3 ? `<p>+ ${firestoreResult.ticketIds.length - 3} more tickets</p>` : ''}
+                    
+                    <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #d97706;">
+                        <h4 style="margin: 0 0 10px 0; color: #92400e;">⚠️ Important Information</h4>
+                        <p style="margin: 5px 0;"><strong>Event Date:</strong> December 15, 2026</p>
+                        <p style="margin: 5px 0;"><strong>Event Time:</strong> 7:00 PM - 2:00 AM</p>
+                        <p style="margin: 5px 0;"><strong>Location:</strong> Grand Arena, Lagos</p>
+                        <p style="margin: 10px 0 0; font-weight: bold;">Please bring a valid ID and this confirmation email for entry.</p>
+                    </div>
+                    
+                    <div style="background: #eff6ff; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3b82f6;">
+                        <h4 style="margin: 0 0 10px 0; color: #1e40af;">Order Reference</h4>
+                        <p style="margin: 0;"><strong>Payment Reference:</strong> ${paymentReference}</p>
+                        <p style="margin: 5px 0 0;"><strong>Order ID:</strong> ${firestoreResult.orderId}</p>
+                    </div>
+                    
+                    <p style="text-align: center; margin-top: 30px; color: #666; font-size: 14px;">
+                        Need help? Contact us at support@straightouttauni.com
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+}
+
+function generateEmailText(customerData, orderData, paymentReference, firestoreResult) {
+    return `
+        STRAIGHT OUTTA UNI - ORDER CONFIRMATION
+        ========================================
+        
+        Thank you for your purchase, ${customerData.name}!
+        
+        ORDER DETAILS:
+        -------------
+        ${firestoreResult.purchasedItems.map(item => 
+            `${item.name} (${item.type === 'table' ? 'Table' : 'Ticket'} × ${item.quantity}) - ₦${(item.price * item.quantity).toLocaleString()}`
+        ).join('\n')}
+        
+        Order Summary:
+        -------------
+        Subtotal: ₦${orderData.subtotal.toLocaleString()}
+        Service Fee (5%): ₦${orderData.serviceFee.toLocaleString()}
+        Total: ₦${orderData.total.toLocaleString()}
+        
+        YOUR TICKET IDs:
+        ---------------
+        ${firestoreResult.ticketIds.slice(0, 5).join('\n')}
+        ${firestoreResult.ticketIds.length > 5 ? `+ ${firestoreResult.ticketIds.length - 5} more tickets` : ''}
+        
+        EVENT INFORMATION:
+        -----------------
+        Date: December 15, 2026
+        Time: 7:00 PM - 2:00 AM
+        Location: Grand Arena, Lagos
+        
+        ORDER REFERENCE:
+        ---------------
+        Payment Reference: ${paymentReference}
+        Order ID: ${firestoreResult.orderId}
+        
+        IMPORTANT:
+        ----------
+        • Please bring a valid ID and this confirmation for entry
+        • Save your ticket IDs for quick check-in
+        • For assistance, contact: support@straightouttauni.com
+        
+        See you at the event! 🎉
+    `;
+}
+
+// ============================================
+// PAYMENT PROCESSING - FIXED VERSION
+// ============================================
 function processPayment() {
+    console.log("🔄 Starting payment process...");
+    
+    // Basic validation
     if (!checkoutData.paymentMethod) {
         showNotification('Please select a payment method');
         return;
@@ -362,70 +688,236 @@ function processPayment() {
     const serviceFee = Math.round(subtotal * 0.05);
     const total = subtotal + serviceFee;
     
+    // Validate customer data is available
+    if (!checkoutData.customer || !checkoutData.customer.email) {
+        showNotification('Please fill in your personal information first');
+        goToStep(1);
+        return;
+    }
+    
     // Show processing notification
     showNotification('Processing payment...');
     
-    // In production, replace with your actual Paystack public key
-    const paystackPublicKey = 'pk_live_322c5190247dd9f132100d38c74eac8a55ef1b42';
+    // ✅ TEST Paystack Key (Public Key)
+    const paystackPublicKey = 'pk_test_9919223f9c2ce89545b15367cdb79e64dab0f96d';
     
-    // Create Paystack handler
-    const handler = PaystackPop.setup({
-        key: paystackPublicKey,
-        email: checkoutData.customer.email,
-        amount: total * 100, // Convert to kobo
-        currency: 'NGN',
-        ref: 'SOU-' + Date.now(),
-        metadata: {
-            custom_fields: [
-                {
-                    display_name: "Customer Name",
-                    variable_name: "customer_name",
-                    value: checkoutData.customer.name
-                },
-                {
-                    display_name: "Phone Number",
-                    variable_name: "phone_number",
-                    value: checkoutData.customer.phone
-                }
-            ]
-        },
-        callback: function(response) {
-            // Payment successful
-            showPaymentSuccess(response.reference);
-            
-            // Clear cart
-            cart = [];
-            saveCart();
-            updateCartDisplay();
-        },
-        onClose: function() {
-            showNotification('Payment was cancelled');
-        }
+    // Generate a unique reference
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substr(2, 8);
+    const reference = `SOU-${timestamp}-${random}`;
+    
+    console.log("Payment Details:", {
+        customerEmail: checkoutData.customer.email,
+        amount: total,
+        amountInKobo: total * 100,
+        reference: reference
     });
     
-    handler.openIframe();
+    // ✅ FIX: Define callback functions BEFORE using them
+    const paymentCallback = function(response) {
+        console.log("✅ Payment successful! Response:", response);
+        
+        // Process payment success
+        handlePaymentSuccess(response.reference, total, response);
+    };
+    
+    const paymentOnClose = function() {
+        console.log("Payment modal was closed");
+        showNotification('Payment was cancelled');
+    };
+    
+    try {
+        // Check if Paystack is available
+        if (typeof PaystackPop === 'undefined') {
+            throw new Error('Paystack payment system is not loaded. Please refresh the page.');
+        }
+        
+        if (typeof PaystackPop.setup !== 'function') {
+            throw new Error('Paystack setup function is not available.');
+        }
+        
+        console.log("Creating Paystack handler...");
+        
+        // Create Paystack handler
+        const handler = PaystackPop.setup({
+            key: paystackPublicKey,
+            email: checkoutData.customer.email,
+            amount: total * 100, // Convert to kobo
+            currency: 'NGN',
+            ref: reference,
+            metadata: {
+                custom_fields: [
+                    {
+                        display_name: "Customer Name",
+                        variable_name: "customer_name",
+                        value: checkoutData.customer.name
+                    },
+                    {
+                        display_name: "Phone Number",
+                        variable_name: "phone_number",
+                        value: checkoutData.customer.phone
+                    },
+                    {
+                        display_name: "Order Items",
+                        variable_name: "order_items",
+                        value: cart.map(item => `${item.name} (x${item.quantity})`).join(', ')
+                    }
+                ]
+            },
+            callback: paymentCallback,  // ✅ Correctly defined function
+            onClose: paymentOnClose     // ✅ Correctly defined function
+        });
+        
+        console.log("Opening Paystack iframe...");
+        
+        // Open the Paystack payment modal
+        handler.openIframe();
+        
+    } catch (error) {
+        console.error("❌ Paystack error:", error);
+        showNotification('Payment system error: ' + error.message);
+    }
 }
 
-function showPaymentSuccess(reference) {
+// ============================================
+// HANDLE PAYMENT SUCCESS
+// ============================================
+async function handlePaymentSuccess(paymentReference, totalAmount, paystackResponse) {
+    console.log("🔄 Processing successful payment...");
+    
+    try {
+        // Prepare order data
+        const orderData = {
+            subtotal: cart.reduce((total, item) => total + (item.price * item.quantity), 0),
+            serviceFee: Math.round(cart.reduce((total, item) => total + (item.price * item.quantity), 0) * 0.05),
+            total: totalAmount
+        };
+        
+        console.log("Order data:", orderData);
+        
+        // Save to Firestore
+        console.log("Saving to Firestore...");
+        const firestoreResult = await saveCustomerToFirestore(
+            checkoutData.customer, 
+            orderData, 
+            paymentReference
+        );
+        
+        console.log("Firestore save result:", firestoreResult);
+        
+        // Send confirmation email
+        console.log("Sending confirmation email...");
+        await sendConfirmationEmail(
+            checkoutData.customer,
+            orderData,
+            paymentReference,
+            firestoreResult
+        );
+        
+        // Update checkout data with ticket IDs
+        checkoutData.ticketIds = firestoreResult.ticketIds;
+        
+        // Show success message
+        showPaymentSuccess(paymentReference, firestoreResult, paystackResponse);
+        
+        // Clear cart
+        cart = [];
+        saveCart();
+        updateCartDisplay();
+        
+        console.log("✅ Payment processing completed successfully");
+        
+    } catch (error) {
+        console.error('❌ Error in payment processing:', error);
+        showNotification('Payment successful but there was an error saving your order. Please contact support with reference: ' + paymentReference);
+    }
+}
+
+// ============================================
+// SHOW PAYMENT SUCCESS
+// ============================================
+function showPaymentSuccess(reference, firestoreResult, paystackResponse = null) {
     const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
     const serviceFee = Math.round(subtotal * 0.05);
     const total = subtotal + serviceFee;
     
+    // Format ticket IDs for display
+    let ticketIdsDisplay = '';
+    if (firestoreResult.ticketIds && firestoreResult.ticketIds.length > 0) {
+        const displayedTickets = firestoreResult.ticketIds.slice(0, 3);
+        ticketIdsDisplay = displayedTickets.map(id => 
+            `<div style="margin: 5px 0; font-family: monospace; font-size: 12px; background: #f8f9fa; padding: 8px; border-radius: 4px;">${id}</div>`
+        ).join('');
+        
+        if (firestoreResult.ticketIds.length > 3) {
+            ticketIdsDisplay += `<div style="margin: 5px 0; color: var(--gray); font-size: 12px;">+ ${firestoreResult.ticketIds.length - 3} more tickets</div>`;
+        }
+    }
+    
+    // Format purchased items for display
+    let itemsDisplay = '';
+    if (firestoreResult.purchasedItems && firestoreResult.purchasedItems.length > 0) {
+        itemsDisplay = firestoreResult.purchasedItems.map(item => 
+            `<div style="margin: 8px 0; padding: 8px; background: rgba(220, 38, 38, 0.05); border-radius: 6px;">
+                <strong>${item.name}</strong> 
+                <span style="color: var(--text-light); font-size: 13px;">(${item.type === 'table' ? 'Table' : 'Ticket'} × ${item.quantity})</span>
+            </div>`
+        ).join('');
+    }
+    
+    // Add Paystack response details if available
+    let paystackDetails = '';
+    if (paystackResponse) {
+        paystackDetails = `
+            <p><strong>Transaction ID:</strong> ${paystackResponse.transaction || 'N/A'}</p>
+            <p><strong>Status:</strong> ${paystackResponse.status || 'N/A'}</p>
+        `;
+    }
+    
     // Update payment details
     paymentDetails.innerHTML = `
-        <p><strong>Order Reference:</strong> ${reference}</p>
-        <p><strong>Customer Name:</strong> ${checkoutData.customer.name}</p>
-        <p><strong>Email:</strong> ${checkoutData.customer.email}</p>
-        <p><strong>Phone:</strong> ${checkoutData.customer.phone}</p>
-        <p><strong>Total Paid:</strong> ₦${total.toLocaleString()}</p>
-        <p><strong>Payment Method:</strong> ${checkoutData.paymentMethod.charAt(0).toUpperCase() + checkoutData.paymentMethod.slice(1)}</p>
-        <p><strong>Confirmation:</strong> A confirmation email has been sent to ${checkoutData.customer.email}</p>
+        <div style="margin-bottom: 20px;">
+            <p><strong>Order Reference:</strong> ${reference}</p>
+            ${paystackDetails}
+            <p><strong>Customer Name:</strong> ${checkoutData.customer.name}</p>
+            <p><strong>Email:</strong> ${checkoutData.customer.email}</p>
+            <p><strong>Phone:</strong> ${checkoutData.customer.phone}</p>
+            <p><strong>Total Paid:</strong> ₦${total.toLocaleString()}</p>
+            <p><strong>Payment Method:</strong> ${checkoutData.paymentMethod.charAt(0).toUpperCase() + checkoutData.paymentMethod.slice(1)}</p>
+        </div>
+        
+        <div style="background: rgba(220, 38, 38, 0.05); padding: 15px; border-radius: 8px; margin: 15px 0;">
+            <p style="color: var(--primary); font-weight: bold; margin-bottom: 10px;">🛒 Purchased Items:</p>
+            ${itemsDisplay}
+        </div>
+        
+        <div style="background: rgba(220, 38, 38, 0.05); padding: 15px; border-radius: 8px; margin: 15px 0;">
+            <p style="color: var(--primary); font-weight: bold; margin-bottom: 10px;">🎫 Your Ticket IDs:</p>
+            ${ticketIdsDisplay}
+            <p style="color: var(--primary-dark); margin-top: 10px; font-size: 13px;">
+                <strong>⚠️ Important:</strong> Save your ticket IDs! You'll need them for entry.
+                Check your email for full details with ticket types.
+            </p>
+        </div>
+        
+        <div style="background: rgba(34, 197, 94, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
+            <p style="color: var(--success); font-weight: bold; margin-bottom: 5px;">
+                ✅ Confirmation email sent to ${checkoutData.customer.email}
+            </p>
+            <p style="color: var(--success-dark); font-size: 13px; margin: 0;">
+                Your email includes all ticket/table details, ticket IDs, and event information.
+            </p>
+        </div>
     `;
     
     // Show success screen
-    goToStep(4);
+    document.getElementById('step3Form').classList.remove('active');
+    document.getElementById('paymentSuccess').classList.add('active');
 }
 
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
 function showNotification(message) {
     // Create notification
     const notification = document.createElement('div');
@@ -436,15 +928,16 @@ function showNotification(message) {
         background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
         color: white;
         padding: 16px 24px;
-        border-radius: var(--radius-sm);
-        box-shadow: var(--shadow-lg);
+        border-radius: 8px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         z-index: 9999;
-        font-weight: 700;
+        font-weight: 600;
         transform: translateX(120%);
         transition: transform 0.3s ease;
         display: flex;
         align-items: center;
         gap: 10px;
+        font-size: 14px;
     `;
     notification.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
     
@@ -468,8 +961,29 @@ function scrollToTickets() {
     document.getElementById('tickets').scrollIntoView({ behavior: 'smooth' });
 }
 
-// Initialize on load
-document.addEventListener('DOMContentLoaded', init);
+// ============================================
+// PAYSTACK VERIFICATION
+// ============================================
+function verifyPaystack() {
+    console.log("=== PAYSTACK VERIFICATION ===");
+    console.log("PaystackPop is defined:", typeof PaystackPop !== 'undefined');
+    console.log("PaystackPop.setup is function:", typeof PaystackPop?.setup === 'function');
+    console.log("Paystack version:", PaystackPop?.VERSION);
+    console.log("============================");
+}
+
+// ============================================
+// INITIALIZE APPLICATION
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM fully loaded");
+    
+    // Verify Paystack is loaded
+    setTimeout(verifyPaystack, 1000);
+    
+    // Initialize app
+    init();
+});
 
 // Make functions globally available
 window.addToCart = addToCart;
