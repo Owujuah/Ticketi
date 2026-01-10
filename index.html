@@ -9,1278 +9,16 @@
     <script src="https://js.paystack.co/v1/inline.js"></script>
     <link rel="stylesheet" href="main.css">
     
-    <!-- <style>
-        :root {
-            --primary: #DC2626;
-            --primary-dark: #B91C1C;
-            --primary-light: #EF4444;
-            --secondary: #FFFFFF;
-            --dark: #111827;
-            --light: #FEF2F2;
-            --gray: #6B7280;
-            --gray-light: #E5E7EB;
-            --success: #10B981;
-            --danger: #EF4444;
-            --warning: #F59E0B;
-            --shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.1), 0 2px 4px -1px rgba(220, 38, 38, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(220, 38, 38, 0.1), 0 4px 6px -2px rgba(220, 38, 38, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(220, 38, 38, 0.1), 0 10px 10px -5px rgba(220, 38, 38, 0.04);
-            --radius: 12px;
-            --radius-lg: 16px;
-            --radius-sm: 8px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', 'Poppins', sans-serif;
-            background-color: var(--light);
-            color: var(--dark);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        /* Header */
-        header {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            box-shadow: var(--shadow);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            padding: 10px 0;
-            border-bottom: 2px solid var(--primary);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 800;
-            font-size: 20px;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
-        }
-
-        .logo-text {
-            font-weight: 800;
-            font-size: 22px;
-            color: var(--dark);
-            letter-spacing: -0.5px;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .logo-text span {
-            color: var(--primary);
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 32px;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: var(--dark);
-            font-weight: 600;
-            font-size: 15px;
-            position: relative;
-            padding: 8px 0;
-        }
-
-        nav a:hover {
-            color: var(--primary);
-        }
-
-        nav a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-            transition: var(--transition);
-        }
-
-        nav a:hover::after {
-            width: 100%;
-        }
-
-        .cta-button {
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: var(--radius-sm);
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.35);
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--dark);
-            font-size: 24px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: var(--radius-sm);
-        }
-
-        /* Hero Section */
-        .hero {
-            padding: 160px 0 100px;
-            background: linear-gradient(135deg, #0F172A 0%, #1F2937 100%);
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><path d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z" fill="%23DC2626" opacity=".2"/></g></svg>');
-            opacity: 0.15;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .hero-badge {
-            display: inline-block;
-            background: rgba(220, 38, 38, 0.2);
-            color: var(--secondary);
-            padding: 10px 24px;
-            border-radius: 100px;
-            font-weight: 700;
-            font-size: 14px;
-            letter-spacing: 1px;
-            margin-bottom: 24px;
-            border: 1px solid rgba(220, 38, 38, 0.3);
-            text-transform: uppercase;
-        }
-
-        .hero-title {
-            font-size: 64px;
-            font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            letter-spacing: -1.5px;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .hero-title span {
-            color: var(--primary-light);
-            position: relative;
-        }
-
-        .hero-title span::after {
-            content: '';
-            position: absolute;
-            bottom: 8px;
-            left: 0;
-            width: 100%;
-            height: 8px;
-            background: rgba(220, 38, 38, 0.2);
-            z-index: -1;
-        }
-
-        .hero-subtitle {
-            font-size: 20px;
-            color: rgba(255, 255, 255, 0.85);
-            max-width: 600px;
-            margin: 0 auto 40px;
-            font-weight: 400;
-        }
-
-        .hero-stats {
-            display: flex;
-            justify-content: center;
-            gap: 48px;
-            margin-top: 60px;
-            flex-wrap: wrap;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--primary-light);
-            margin-bottom: 8px;
-        }
-
-        .stat-label {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Tickets Section */
-        .tickets {
-            padding: 100px 0;
-            background-color: white;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .section-subtitle {
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 12px;
-        }
-
-        .section-title {
-            font-size: 48px;
-            font-weight: 800;
-            margin-bottom: 16px;
-            letter-spacing: -1px;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .section-desc {
-            color: var(--gray);
-            font-size: 18px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .ticket-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 32px;
-            margin-bottom: 80px;
-        }
-
-        .ticket-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            border: 2px solid transparent;
-            position: relative;
-        }
-
-        .ticket-card:hover {
-            transform: translateY(-12px);
-            box-shadow: var(--shadow-xl);
-            border-color: var(--primary);
-        }
-
-        .ticket-card.popular {
-            border-color: var(--primary);
-        }
-
-        .popular-badge {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
-            padding: 8px 24px;
-            border-radius: 100px;
-            font-weight: 700;
-            font-size: 13px;
-            z-index: 10;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
-        }
-
-        .ticket-header {
-            padding: 32px 32px 24px;
-            text-align: center;
-            background: linear-gradient(135deg, rgba(220, 38, 38, 0.05) 0%, rgba(239, 68, 68, 0.05) 100%);
-        }
-
-        .ticket-type {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--dark);
-            margin-bottom: 12px;
-        }
-
-        .ticket-price {
-            font-size: 48px;
-            font-weight: 900;
-            margin-bottom: 4px;
-            color: var(--primary-dark);
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .ticket-price span {
-            font-size: 18px;
-            color: var(--gray);
-            font-weight: 600;
-        }
-
-        .ticket-desc {
-            color: var(--gray);
-            font-size: 15px;
-        }
-
-        .ticket-features {
-            padding: 24px 32px;
-            border-bottom: 1px solid var(--gray-light);
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .feature-item i {
-            color: var(--primary);
-            font-size: 16px;
-            width: 24px;
-            height: 24px;
-            background: rgba(220, 38, 38, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .ticket-footer {
-            padding: 24px 32px;
-            text-align: center;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 16px 32px;
-            border-radius: var(--radius-sm);
-            font-weight: 700;
-            font-size: 16px;
-            text-decoration: none;
-            cursor: pointer;
-            transition: var(--transition);
-            border: none;
-            width: 100%;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .btn-primary {
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.35);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-
-        .btn-outline:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* Tables Section */
-        .tables {
-            padding: 0 0 100px;
-        }
-
-        .table-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 24px;
-        }
-
-        .table-card {
-            background: white;
-            border-radius: var(--radius);
-            padding: 32px;
-            text-align: center;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            border: 2px solid transparent;
-        }
-
-        .table-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--primary);
-        }
-
-        .table-name {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 16px;
-            color: var(--dark);
-        }
-
-        .table-price {
-            font-size: 42px;
-            font-weight: 900;
-            margin-bottom: 16px;
-            color: var(--primary-dark);
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .table-capacity {
-            color: var(--gray);
-            font-size: 15px;
-            margin-bottom: 24px;
-            background: rgba(220, 38, 38, 0.05);
-            padding: 8px 16px;
-            border-radius: 100px;
-            display: inline-block;
-        }
-
-        .table-features {
-            text-align: left;
-            margin-bottom: 32px;
-        }
-
-        .table-feature {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-            font-size: 15px;
-        }
-
-        .table-feature i {
-            color: var(--primary);
-            font-size: 14px;
-        }
-
-        /* Cart Section */
-        .cart-section {
-            padding: 100px 0;
-            background-color: #FEF2F2;
-        }
-
-        .cart-container {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 48px;
-            box-shadow: var(--shadow);
-            border: 2px solid rgba(220, 38, 38, 0.1);
-        }
-
-        .cart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-            padding-bottom: 24px;
-            border-bottom: 2px solid var(--gray-light);
-        }
-
-        .cart-title {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--dark);
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .cart-badge {
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
-            padding: 10px 24px;
-            border-radius: 100px;
-            font-weight: 700;
-            font-size: 15px;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
-        }
-
-        .cart-empty {
-            text-align: center;
-            padding: 60px 0;
-        }
-
-        .cart-empty-icon {
-            font-size: 72px;
-            color: var(--gray-light);
-            margin-bottom: 24px;
-            opacity: 0.5;
-        }
-
-        .cart-empty h3 {
-            font-size: 28px;
-            margin-bottom: 12px;
-            color: var(--dark);
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .cart-empty p {
-            color: var(--gray);
-            margin-bottom: 32px;
-            font-size: 16px;
-        }
-
-        .cart-items {
-            margin-bottom: 32px;
-        }
-
-        .cart-item {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            align-items: center;
-            padding: 24px;
-            background: #FEF2F2;
-            border-radius: var(--radius);
-            margin-bottom: 16px;
-            border: 1px solid rgba(220, 38, 38, 0.1);
-        }
-
-        .item-name {
-            font-weight: 700;
-            font-size: 18px;
-            color: var(--dark);
-        }
-
-        .item-price {
-            font-weight: 800;
-            font-size: 20px;
-            color: var(--primary);
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .item-quantity {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            justify-content: center;
-        }
-
-        .quantity-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: white;
-            border: 2px solid var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 18px;
-            transition: var(--transition);
-            color: var(--primary);
-        }
-
-        .quantity-btn:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .quantity {
-            font-weight: 700;
-            font-size: 20px;
-            min-width: 40px;
-            text-align: center;
-            color: var(--dark);
-        }
-
-        .item-remove {
-            background: transparent;
-            border: 2px solid var(--danger);
-            color: var(--danger);
-            font-weight: 700;
-            cursor: pointer;
-            padding: 10px 20px;
-            border-radius: var(--radius-sm);
-            transition: var(--transition);
-            font-size: 14px;
-        }
-
-        .item-remove:hover {
-            background: var(--danger);
-            color: white;
-        }
-
-        .cart-summary {
-            background: #FEF2F2;
-            border-radius: var(--radius);
-            padding: 32px;
-            border: 1px solid rgba(220, 38, 38, 0.1);
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 18px 0;
-            border-bottom: 1px solid rgba(220, 38, 38, 0.1);
-            font-size: 17px;
-        }
-
-        .summary-row.total {
-            border-bottom: none;
-            font-weight: 900;
-            font-size: 28px;
-            color: var(--primary-dark);
-            font-family: 'Poppins', sans-serif;
-            margin-top: 10px;
-        }
-
-        .checkout-btn {
-            margin-top: 32px;
-            font-size: 18px;
-            padding: 20px 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .checkout-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .checkout-btn:disabled:hover {
-            transform: none;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
-        }
-
-        /* IMPROVED CHECKOUT MODAL */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            z-index: 2000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-        }
-
-        .checkout-modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            background: white;
-            border-radius: var(--radius-lg);
-            width: 90%;
-            max-width: 800px;
-            max-height: 85vh;
-            overflow-y: auto;
-            z-index: 2001;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
-            border: 2px solid var(--primary);
-        }
-
-        .checkout-modal.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .modal-header {
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
-            padding: 32px;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .modal-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-            color: white;
-        }
-
-        .modal-title {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 8px;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .modal-subtitle {
-            opacity: 0.9;
-            font-size: 16px;
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            font-size: 24px;
-            cursor: pointer;
-            color: white;
-            transition: var(--transition);
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            z-index: 11;
-        }
-
-        .close-modal:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .modal-body {
-            padding: 40px;
-        }
-
-        .form-steps {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 40px;
-            position: relative;
-        }
-
-        .form-steps::before {
-            content: '';
-            position: absolute;
-            top: 20px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--gray-light);
-            z-index: 1;
-        }
-
-        .step {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            flex: 1;
-        }
-
-        .step-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--gray-light);
-            color: var(--gray);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            margin: 0 auto 8px;
-            transition: var(--transition);
-        }
-
-        .step.active .step-circle {
-            background: var(--primary);
-            color: white;
-        }
-
-        .step.completed .step-circle {
-            background: var(--success);
-            color: white;
-        }
-
-        .step-label {
-            font-size: 14px;
-            color: var(--gray);
-            font-weight: 600;
-        }
-
-        .form-step {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .form-step.active {
-            display: block;
-        }
-
-        .step-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 24px;
-            color: var(--dark);
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        .form-group.full-width {
-            grid-column: span 2;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 15px;
-            color: var(--dark);
-        }
-
-        .form-label .required {
-            color: var(--primary);
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 16px;
-            border: 2px solid var(--gray-light);
-            border-radius: var(--radius-sm);
-            font-size: 16px;
-            font-family: 'Inter', sans-serif;
-            transition: var(--transition);
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
-        }
-
-        .form-select {
-            width: 100%;
-            padding: 16px;
-            border: 2px solid var(--gray-light);
-            border-radius: var(--radius-sm);
-            font-size: 16px;
-            background: white;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: var(--transition);
-        }
-
-        .form-select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
-        }
-
-        .order-summary-box {
-            background: #FEF2F2;
-            border-radius: var(--radius-sm);
-            padding: 24px;
-            border: 1px solid rgba(220, 38, 38, 0.1);
-            margin-bottom: 32px;
-        }
-
-        .order-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid rgba(220, 38, 38, 0.1);
-        }
-
-        .order-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        .order-total {
-            font-weight: 800;
-            font-size: 20px;
-            color: var(--primary);
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 2px solid rgba(220, 38, 38, 0.2);
-        }
-
-        .payment-methods {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-
-        .payment-method {
-            border: 2px solid var(--gray-light);
-            border-radius: var(--radius-sm);
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .payment-method:hover {
-            border-color: var(--primary);
-            background: rgba(220, 38, 38, 0.05);
-        }
-
-        .payment-method.selected {
-            border-color: var(--primary);
-            background: rgba(220, 38, 38, 0.1);
-        }
-
-        .payment-method i {
-            font-size: 32px;
-            margin-bottom: 12px;
-            color: var(--primary);
-        }
-
-        .payment-method span {
-            display: block;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .security-badge {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            color: var(--success);
-            font-weight: 600;
-            margin-top: 32px;
-            padding: 16px;
-            background: rgba(16, 185, 129, 0.1);
-            border-radius: var(--radius-sm);
-        }
-
-        .modal-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 40px;
-            padding-top: 32px;
-            border-top: 1px solid var(--gray-light);
-        }
-
-        .btn-back {
-            background: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-            padding: 16px 32px;
-            border-radius: var(--radius-sm);
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-back:hover {
-            background: rgba(220, 38, 38, 0.1);
-        }
-
-        .btn-next {
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            border-radius: var(--radius-sm);
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-width: 200px;
-            justify-content: center;
-        }
-
-        .btn-next:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.35);
-        }
-
-        .payment-success {
-            text-align: center;
-            padding: 40px 20px;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .payment-success-icon {
-            font-size: 80px;
-            color: var(--success);
-            margin-bottom: 24px;
-        }
-
-        .payment-success h3 {
-            font-size: 32px;
-            margin-bottom: 16px;
-            color: var(--dark);
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .payment-success p {
-            color: var(--gray);
-            margin-bottom: 32px;
-            font-size: 18px;
-            line-height: 1.6;
-        }
-
-        .payment-details {
-            background: #FEF2F2;
-            border-radius: var(--radius-sm);
-            padding: 24px;
-            margin: 32px 0;
-            text-align: left;
-        }
-
-        .payment-details p {
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .payment-details p:last-child {
-            margin-bottom: 0;
-        }
-
-        .payment-details strong {
-            color: var(--dark);
-        }
-
-        /* Footer */
-        footer {
-            background: var(--dark);
-            color: white;
-            padding: 80px 0 40px;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 48px;
-            margin-bottom: 60px;
-        }
-
-        .footer-logo {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            display: inline-block;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .footer-logo span {
-            color: var(--primary-light);
-        }
-
-        .footer-desc {
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 32px;
-            line-height: 1.7;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 16px;
-        }
-
-        .social-link {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .social-link:hover {
-            background: var(--primary);
-            transform: translateY(-3px);
-        }
-
-        .copyright {
-            text-align: center;
-            padding-top: 40px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 14px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .mobile-menu-btn {
-                display: block;
-            }
-            
-            nav ul {
-                position: fixed;
-                top: 70px;
-                left: 0;
-                width: 100%;
-                background: white;
-                flex-direction: column;
-                padding: 24px;
-                box-shadow: var(--shadow-lg);
-                transform: translateY(-100%);
-                opacity: 0;
-                visibility: hidden;
-                transition: var(--transition);
-                z-index: 999;
-            }
-            
-            nav ul.active {
-                transform: translateY(0);
-                opacity: 1;
-                visibility: visible;
-            }
-            
-            .hero-title {
-                font-size: 40px;
-            }
-            
-            .section-title {
-                font-size: 36px;
-            }
-            
-            .ticket-grid, .table-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .cart-item {
-                grid-template-columns: 1fr;
-                gap: 16px;
-                text-align: center;
-            }
-            
-            .checkout-modal {
-                width: 95%;
-                max-height: 90vh;
-            }
-            
-            .modal-body {
-                padding: 24px;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-group.full-width {
-                grid-column: span 1;
-            }
-            
-            .payment-methods {
-                grid-template-columns: 1fr;
-            }
-            
-            .modal-actions {
-                flex-direction: column;
-                gap: 16px;
-            }
-            
-            .btn-back, .btn-next {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero-title {
-                font-size: 32px;
-            }
-            
-            .hero-subtitle {
-                font-size: 18px;
-            }
-            
-            .section-title {
-                font-size: 28px;
-            }
-            
-            .hero-stats {
-                flex-direction: column;
-                gap: 24px;
-            }
-        }
-    </style> -->
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <!-- Header -->
     <header>
         <div class="container header-content">
             <a href="#" class="logo">
-                <!-- <div class="logo-icon">SOU</div> -->
                 <div class="logo-text">Straight <span>Outta Uni</span></div>
             </a>
             
@@ -1306,7 +44,6 @@
     <!-- Hero Section -->
     <section class="hero" id="hero">
         <div class="container hero-content">
-            <!-- <div class="hero-badge">The Ultimate Graduation Celebration</div> -->
             <h1 class="hero-title">Straight <span>Outta Uni</span></h1>
             <p class="hero-subtitle">Celebrate your academic journey with the biggest post-graduation event of the year. Music, networking, and memories that last a lifetime.</p>
             
@@ -1361,10 +98,6 @@
                             <i class="fas fa-check"></i>
                             <span>Standard bar access</span>
                         </div>
-                        <!-- <div class="feature-item">
-                            <i class="fas fa-check"></i>
-                            <span>Event souvenir</span>
-                        </div> -->
                         <div class="feature-item">
                             <i class="fas fa-check"></i>
                             <span>Access to photo booths</span>
@@ -1379,7 +112,6 @@
                 
                 <!-- VIP Ticket -->
                 <div class="ticket-card popular">
-                    <!-- <div class="popular-badge">MOST POPULAR</div> -->
                     <div class="ticket-header">
                         <div class="ticket-type">VIP</div>
                         <div class="ticket-price">₦7<span>,000</span></div>
@@ -1394,10 +126,6 @@
                             <i class="fas fa-check"></i>
                             <span>VIP lounge access</span>
                         </div>
-                        <!-- <div class="feature-item">
-                            <i class="fas fa-check"></i>
-                            <span>Complimentary premium drinks</span>
-                        </div> -->
                         <div class="feature-item">
                             <i class="fas fa-check"></i>
                             <span>Fast-track entry</span>
@@ -1730,7 +458,7 @@
                     <div class="footer-logo">Straight <span>Outta Uni</span></div>
                     <p class="footer-desc">The ultimate post-graduation celebration bringing together graduates for an unforgettable night of music, networking, and celebration.</p>
                     <div class="social-links">
-                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.instagram.com/straightoutta_uni?igsh=OHhzbzV5dWZoeG5p&utm_source=qr" class="social-link"><i class="fab fa-instagram"></i></a>
                         <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
                         <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" class="social-link"><i class="fab fa-tiktok"></i></a>
@@ -1761,18 +489,45 @@
             </div>
         </div>
     </footer>
-    <script src="script.js"></script>
 
-    <!-- <script>
-        // Cart data
+    <script>
+        // ============================================
+        // FIREBASE CONFIGURATION
+        // ============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfjv99aMtQsXs0DQhQPw6eebBQeL65UsY",
+            authDomain: "ticket-b593e.firebaseapp.com",
+            projectId: "ticket-b593e",
+            storageBucket: "ticket-b593e.firebasestorage.app",
+            messagingSenderId: "591348153786",
+            appId: "1:591348153786:web:d2131cabfaca5280dbb183",
+            measurementId: "G-Z3EWKN2PJM"
+        };
+
+        // Initialize Firebase
+        let db;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            console.log("Firebase initialized successfully");
+        } catch (error) {
+            console.error("Firebase initialization error:", error);
+        }
+
+        // ============================================
+        // APPLICATION STATE
+        // ============================================
         let cart = JSON.parse(localStorage.getItem('straightOuttaUniCart')) || [];
         let checkoutData = {
             customer: {},
-            paymentMethod: 'card'
+            paymentMethod: 'card',
+            ticketIds: []
         };
         let currentStep = 1;
 
-        // DOM Elements
+        // ============================================
+        // DOM ELEMENTS
+        // ============================================
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const navMenu = document.getElementById('navMenu');
         const cartButton = document.getElementById('cartButton');
@@ -1809,13 +564,17 @@
         const orderSummaryBox = document.getElementById('orderSummaryBox');
         const paymentDetails = document.getElementById('paymentDetails');
 
-        // Initialize
+        // ============================================
+        // INITIALIZATION
+        // ============================================
         function init() {
             updateCartDisplay();
             setupEventListeners();
         }
 
-        // Setup event listeners
+        // ============================================
+        // EVENT LISTENERS SETUP
+        // ============================================
         function setupEventListeners() {
             // Mobile menu
             mobileMenuBtn.addEventListener('click', () => {
@@ -1890,7 +649,9 @@
             });
         }
 
-        // Cart functions
+        // ============================================
+        // CART FUNCTIONS
+        // ============================================
         function addToCart(name, price) {
             const existingItem = cart.find(item => item.name === name);
             
@@ -1975,7 +736,9 @@
             }
         }
 
-        // Checkout modal functions
+        // ============================================
+        // CHECKOUT MODAL FUNCTIONS
+        // ============================================
         function openCheckoutModal() {
             if (cart.length === 0) {
                 showNotification('Your cart is empty');
@@ -2069,7 +832,8 @@
             checkoutData.customer = {
                 name: fullNameInput.value.trim(),
                 email: emailInput.value.trim(),
-                phone: phoneInput.value.trim()
+                phone: phoneInput.value.trim(),
+                timestamp: new Date().toISOString()
             };
             
             // Update order summary
@@ -2117,6 +881,105 @@
             orderSummaryBox.innerHTML = summaryHTML;
         }
 
+        // ============================================
+        // FIREBASE FUNCTIONS - IMPROVED VERSION
+        // ============================================
+        async function saveCustomerToFirestore(customerData, orderData, paymentReference) {
+            try {
+                console.log("Starting to save to Firestore...");
+                console.log("Customer Data:", customerData);
+                console.log("Order Data:", orderData);
+                console.log("Cart:", cart);
+                
+                // Generate ticket IDs for each item in cart
+                const ticketIds = [];
+                const purchasedItems = [];
+                
+                // Process each item in the cart
+                for (const item of cart) {
+                    // Generate a unique ticket ID for each quantity
+                    for (let i = 0; i < item.quantity; i++) {
+                        const ticketId = `SOU-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                        ticketIds.push(ticketId);
+                        
+                        // Create individual ticket purchase record
+                        const ticketPurchase = {
+                            ticketId: ticketId,
+                            customerName: customerData.name,
+                            customerEmail: customerData.email,
+                            customerPhone: customerData.phone,
+                            ticketType: item.name,
+                            ticketPrice: item.price,
+                            purchaseDate: firebase.firestore.FieldValue.serverTimestamp(),
+                            paymentReference: paymentReference,
+                            status: 'valid',
+                            eventDate: '2026-12-15',
+                            eventTime: '19:00',
+                            eventLocation: 'Grand Arena, Lagos',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        };
+                        
+                        purchasedItems.push(ticketPurchase);
+                    }
+                }
+                
+                // Save each ticket purchase individually
+                const ticketPromises = purchasedItems.map(ticket => {
+                    return db.collection('ticketPurchases').add(ticket)
+                        .then(docRef => {
+                            console.log('Ticket purchase saved with ID:', docRef.id);
+                            return docRef.id;
+                        })
+                        .catch(error => {
+                            console.error('Error saving ticket purchase:', error);
+                            throw error;
+                        });
+                });
+                
+                // Wait for all ticket purchases to be saved
+                await Promise.all(ticketPromises);
+                
+                // Save the main order document
+                const orderDocument = {
+                    customer: customerData,
+                    items: cart.map(item => ({
+                        name: item.name,
+                        price: item.price,
+                        quantity: item.quantity
+                    })),
+                    orderTotal: orderData.total,
+                    subtotal: orderData.subtotal,
+                    serviceFee: orderData.serviceFee,
+                    paymentReference: paymentReference,
+                    paymentMethod: checkoutData.paymentMethod,
+                    ticketIds: ticketIds,
+                    orderDate: firebase.firestore.FieldValue.serverTimestamp(),
+                    specialInstructions: document.getElementById('specialInstructions').value.trim() || '',
+                    status: 'completed',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                console.log("Saving order document:", orderDocument);
+                
+                // Save to Firestore
+                const docRef = await db.collection('orders').add(orderDocument);
+                
+                console.log('✅ Order saved to Firestore with ID:', docRef.id);
+                return {
+                    orderId: docRef.id,
+                    ticketIds: ticketIds
+                };
+                
+            } catch (error) {
+                console.error('❌ Error saving to Firestore:', error);
+                console.error('Error details:', error.message, error.code);
+                throw error;
+            }
+        }
+
+        // ============================================
+        // PAYMENT PROCESSING
+        // ============================================
         function processPayment() {
             if (!checkoutData.paymentMethod) {
                 showNotification('Please select a payment method');
@@ -2128,11 +991,23 @@
             const serviceFee = Math.round(subtotal * 0.05);
             const total = subtotal + serviceFee;
             
+            // Validate customer data is available
+            if (!checkoutData.customer || !checkoutData.customer.email) {
+                showNotification('Please fill in your personal information first');
+                goToStep(1);
+                return;
+            }
+            
             // Show processing notification
             showNotification('Processing payment...');
             
-            // In production, replace with your actual Paystack public key
-            const paystackPublicKey = 'pk_test_9919223f9c2ce89545b15367cdb79e64dab0f96d';
+            // Paystack public key - TEST MODE
+            const paystackPublicKey = 'pk_live_322c5190247dd9f132100d38c74eac8a55ef1b42';
+            
+            // Generate a unique reference
+            const reference = `SOU-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+            
+            console.log("Starting payment with reference:", reference);
             
             // Create Paystack handler
             const handler = PaystackPop.setup({
@@ -2140,7 +1015,7 @@
                 email: checkoutData.customer.email,
                 amount: total * 100, // Convert to kobo
                 currency: 'NGN',
-                ref: 'SOU-' + Date.now(),
+                ref: reference,
                 metadata: {
                     custom_fields: [
                         {
@@ -2155,14 +1030,42 @@
                         }
                     ]
                 },
-                callback: function(response) {
-                    // Payment successful
-                    showPaymentSuccess(response.reference);
+                callback: async function(response) {
+                    console.log("Payment successful! Response:", response);
                     
-                    // Clear cart
-                    cart = [];
-                    saveCart();
-                    updateCartDisplay();
+                    try {
+                        const orderData = {
+                            subtotal: subtotal,
+                            serviceFee: serviceFee,
+                            total: total
+                        };
+                        
+                        // Save to Firestore
+                        console.log("Saving to Firestore...");
+                        const firestoreResult = await saveCustomerToFirestore(
+                            checkoutData.customer, 
+                            orderData, 
+                            response.reference
+                        );
+                        
+                        console.log("Firestore save result:", firestoreResult);
+                        
+                        // Update checkout data with ticket IDs
+                        checkoutData.ticketIds = firestoreResult.ticketIds;
+                        
+                        // Show success message
+                        showPaymentSuccess(response.reference, firestoreResult);
+                        
+                        // Clear cart
+                        cart = [];
+                        saveCart();
+                        updateCartDisplay();
+                        
+                    } catch (error) {
+                        console.error('Error in payment callback:', error);
+                        showNotification('Payment successful but there was an error saving your order. Please contact support with reference: ' + response.reference);
+                        closeCheckoutModal();
+                    }
                 },
                 onClose: function() {
                     showNotification('Payment was cancelled');
@@ -2172,26 +1075,57 @@
             handler.openIframe();
         }
 
-        function showPaymentSuccess(reference) {
+        function showPaymentSuccess(reference, firestoreResult) {
             const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
             const serviceFee = Math.round(subtotal * 0.05);
             const total = subtotal + serviceFee;
             
+            // Format ticket IDs for display (show only first 3 for brevity)
+            let ticketIdsDisplay = '';
+            if (checkoutData.ticketIds && checkoutData.ticketIds.length > 0) {
+                const displayedTickets = checkoutData.ticketIds.slice(0, 3);
+                ticketIdsDisplay = displayedTickets.map(id => 
+                    `<div style="margin: 5px 0; font-family: monospace; font-size: 12px;">${id}</div>`
+                ).join('');
+                
+                if (checkoutData.ticketIds.length > 3) {
+                    ticketIdsDisplay += `<div style="margin: 5px 0; color: var(--gray);">+ ${checkoutData.ticketIds.length - 3} more tickets</div>`;
+                }
+            }
+            
             // Update payment details
             paymentDetails.innerHTML = `
-                <p><strong>Order Reference:</strong> ${reference}</p>
-                <p><strong>Customer Name:</strong> ${checkoutData.customer.name}</p>
-                <p><strong>Email:</strong> ${checkoutData.customer.email}</p>
-                <p><strong>Phone:</strong> ${checkoutData.customer.phone}</p>
-                <p><strong>Total Paid:</strong> ₦${total.toLocaleString()}</p>
-                <p><strong>Payment Method:</strong> ${checkoutData.paymentMethod.charAt(0).toUpperCase() + checkoutData.paymentMethod.slice(1)}</p>
-                <p><strong>Confirmation:</strong> A confirmation email has been sent to ${checkoutData.customer.email}</p>
+                <div style="margin-bottom: 20px;">
+                    <p><strong>Order Reference:</strong> ${reference}</p>
+                    <p><strong>Firestore Order ID:</strong> ${firestoreResult.orderId}</p>
+                    <p><strong>Customer Name:</strong> ${checkoutData.customer.name}</p>
+                    <p><strong>Email:</strong> ${checkoutData.customer.email}</p>
+                    <p><strong>Phone:</strong> ${checkoutData.customer.phone}</p>
+                    <p><strong>Total Paid:</strong> ₦${total.toLocaleString()}</p>
+                    <p><strong>Payment Method:</strong> ${checkoutData.paymentMethod.charAt(0).toUpperCase() + checkoutData.paymentMethod.slice(1)}</p>
+                </div>
+                
+                <div style="background: rgba(220, 38, 38, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
+                    <p style="color: var(--primary); font-weight: bold; margin-bottom: 10px;">🎫 Your Ticket IDs:</p>
+                    ${ticketIdsDisplay}
+                    <p style="color: var(--primary-dark); margin-top: 10px; font-size: 14px;">
+                        <strong>⚠️ Important:</strong> Save your ticket IDs! You'll need them for entry.
+                        Check your email for full details.
+                    </p>
+                </div>
+                
+                <p style="color: var(--success); font-weight: bold; margin-top: 20px;">
+                    ✅ Confirmation email has been sent to ${checkoutData.customer.email}
+                </p>
             `;
             
             // Show success screen
             goToStep(4);
         }
 
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
         function showNotification(message) {
             // Create notification
             const notification = document.createElement('div');
@@ -2234,7 +1168,9 @@
             document.getElementById('tickets').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Initialize on load
+        // ============================================
+        // INITIALIZE APPLICATION
+        // ============================================
         document.addEventListener('DOMContentLoaded', init);
         
         // Make functions globally available
@@ -2242,6 +1178,6 @@
         window.removeFromCart = removeFromCart;
         window.updateQuantity = updateQuantity;
         window.scrollToTickets = scrollToTickets;
-    </script> -->
+    </script>
 </body>
 </html>
