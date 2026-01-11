@@ -13,12 +13,24 @@ const firebaseConfig = {
 
 // Initialize Firebase
 let db;
+let firebaseInitialized = false;
 try {
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     db = firebase.firestore();
+    
+    // Enable offline persistence
+    db.enablePersistence()
+      .catch((err) => {
+          console.warn("Offline persistence not enabled:", err);
+      });
+    
+    firebaseInitialized = true;
     console.log("✅ Firebase initialized successfully");
 } catch (error) {
     console.error("❌ Firebase initialization error:", error);
+    firebaseInitialized = false;
 }
 
 // ============================================
@@ -256,6 +268,11 @@ function openCheckoutModal() {
         return;
     }
     
+    if (!firebaseInitialized) {
+        showNotification('Payment system is not available. Please refresh the page.');
+        return;
+    }
+
     // Reset form
     fullNameInput.value = '';
     emailInput.value = '';
@@ -402,19 +419,23 @@ function updateOrderSummary() {
 async function saveCustomerToFirestore(customerData, orderData, paymentReference) {
     try {
         console.log("🔄 Starting to save to Firestore...");
-        
-        // Generate ticket IDs for each item in cart
-        const ticketIds = [];
+
+        const ticketDetails = []; // array of { id, name, type, price }
         const purchasedItems = [];
-        
+
         // Process each item in the cart
         for (const item of cart) {
             // Generate a unique ticket ID for each quantity
             for (let i = 0; i < item.quantity; i++) {
                 const ticketId = `SOU-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-                ticketIds.push(ticketId);
-                
-                // Create individual ticket purchase record with TYPE included
+                ticketDetails.push({
+                    id: ticketId,
+                    name: item.name,
+                    type: item.type,
+                    price: item.price
+                });
+
+                // Create individual ticket purchase record
                 const ticketPurchase = {
                     ticketId: ticketId,
                     customerName: customerData.name,
@@ -432,11 +453,11 @@ async function saveCustomerToFirestore(customerData, orderData, paymentReference
                     quantity: 1,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
-                
+
                 purchasedItems.push(ticketPurchase);
             }
         }
-        
+
         // Save each ticket purchase individually
         const ticketPromises = purchasedItems.map(ticket => {
             return db.collection('ticketPurchases').add(ticket)
@@ -449,10 +470,10 @@ async function saveCustomerToFirestore(customerData, orderData, paymentReference
                     throw error;
                 });
         });
-        
+
         // Wait for all ticket purchases to be saved
         await Promise.all(ticketPromises);
-        
+
         // Save the main order document
         const orderDocument = {
             customer: customerData,
@@ -467,44 +488,36 @@ async function saveCustomerToFirestore(customerData, orderData, paymentReference
             serviceFee: orderData.serviceFee,
             paymentReference: paymentReference,
             paymentMethod: checkoutData.paymentMethod,
-            ticketIds: ticketIds,
+            ticketIds: ticketDetails.map(t => t.id),
+            ticketDetails: ticketDetails, // include details
             orderDate: firebase.firestore.FieldValue.serverTimestamp(),
             specialInstructions: document.getElementById('specialInstructions').value.trim() || '',
             status: 'completed',
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         };
-        
+
         console.log("Saving order document:", orderDocument);
-        
+
         // Save to Firestore
         const docRef = await db.collection('orders').add(orderDocument);
-        
+
         console.log('✅ Order saved to Firestore with ID:', docRef.id);
-        
-        // Store purchased items for email sending
-        checkoutData.purchasedItems = cart.map(item => ({
-            name: item.name,
-            type: item.type,
-            price: item.price,
-            quantity: item.quantity
-        }));
-        
+
         return {
             orderId: docRef.id,
-            ticketIds: ticketIds,
-            purchasedItems: cart.map(item => ({
-                name: item.name,
-                type: item.type,
-                price: item.price,
-                quantity: item.quantity
-            }))
+            ticketDetails: ticketDetails
         };
-        
+
     } catch (error) {
         console.error('❌ Error saving to Firestore:', error);
         throw error;
     }
 }
+
+
+
+
+
 
 // ============================================
 // SEND EMAIL FUNCTION
@@ -784,7 +797,7 @@ function processPayment() {
 // ============================================
 async function handlePaymentSuccess(paymentReference, totalAmount, paystackResponse) {
     console.log("🔄 Processing successful payment...");
-    
+
     try {
         // Prepare order data
         const orderData = {
@@ -792,19 +805,19 @@ async function handlePaymentSuccess(paymentReference, totalAmount, paystackRespo
             serviceFee: Math.round(cart.reduce((total, item) => total + (item.price * item.quantity), 0) * 0.05),
             total: totalAmount
         };
-        
+
         console.log("Order data:", orderData);
-        
+
         // Save to Firestore
         console.log("Saving to Firestore...");
         const firestoreResult = await saveCustomerToFirestore(
-            checkoutData.customer, 
-            orderData, 
+            checkoutData.customer,
+            orderData,
             paymentReference
         );
-        
+
         console.log("Firestore save result:", firestoreResult);
-        
+
         // Send confirmation email
         console.log("Sending confirmation email...");
         await sendConfirmationEmail(
@@ -813,25 +826,29 @@ async function handlePaymentSuccess(paymentReference, totalAmount, paystackRespo
             paymentReference,
             firestoreResult
         );
-        
+
         // Update checkout data with ticket IDs
-        checkoutData.ticketIds = firestoreResult.ticketIds;
-        
-        // Show success message
+        checkoutData.ticketIds = firestoreResult.ticketDetails.map(t => t.id);
+
+        // Show success message WITH TICKET DETAILS
         showPaymentSuccess(paymentReference, firestoreResult, paystackResponse);
-        
+
         // Clear cart
         cart = [];
         saveCart();
         updateCartDisplay();
-        
+
         console.log("✅ Payment processing completed successfully");
-        
+
     } catch (error) {
         console.error('❌ Error in payment processing:', error);
         // showNotification('Payment successful but there was an error saving your order. Please contact support with reference: ' + paymentReference);
     }
 }
+
+
+
+
 
 // ============================================
 // SHOW PAYMENT SUCCESS
@@ -840,80 +857,290 @@ function showPaymentSuccess(reference, firestoreResult, paystackResponse = null)
     const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
     const serviceFee = Math.round(subtotal * 0.05);
     const total = subtotal + serviceFee;
-    
-    // Format ticket IDs for display
-    let ticketIdsDisplay = '';
-    if (firestoreResult.ticketIds && firestoreResult.ticketIds.length > 0) {
-        const displayedTickets = firestoreResult.ticketIds.slice(0, 3);
-        ticketIdsDisplay = displayedTickets.map(id => 
-            `<div style="margin: 5px 0; font-family: monospace; font-size: 12px; background: #f8f9fa; padding: 8px; border-radius: 4px;">${id}</div>`
-        ).join('');
-        
-        if (firestoreResult.ticketIds.length > 3) {
-            ticketIdsDisplay += `<div style="margin: 5px 0; color: var(--gray); font-size: 12px;">+ ${firestoreResult.ticketIds.length - 3} more tickets</div>`;
-        }
-    }
-    
-    // Format purchased items for display
-    let itemsDisplay = '';
-    if (firestoreResult.purchasedItems && firestoreResult.purchasedItems.length > 0) {
-        itemsDisplay = firestoreResult.purchasedItems.map(item => 
-            `<div style="margin: 8px 0; padding: 8px; background: rgba(220, 38, 38, 0.05); border-radius: 6px;">
-                <strong>${item.name}</strong> 
-                <span style="color: var(--text-light); font-size: 13px;">(${item.type === 'table' ? 'Table' : 'Ticket'} × ${item.quantity})</span>
-            </div>`
-        ).join('');
-    }
-    
-    // Add Paystack response details if available
-    let paystackDetails = '';
-    if (paystackResponse) {
-        paystackDetails = `
-            <p><strong>Transaction ID:</strong> ${paystackResponse.transaction || 'N/A'}</p>
-            <p><strong>Status:</strong> ${paystackResponse.status || 'N/A'}</p>
+
+    // Clear previous content
+    paymentDetails.innerHTML = '';
+
+    // Create container for ticket cards
+    const ticketsContainer = document.createElement('div');
+    ticketsContainer.className = 'ticket-cards-container';
+    ticketsContainer.id = 'ticketCardsContainer';
+
+    // Generate a ticket card for each ticket
+    firestoreResult.ticketDetails.forEach((ticket, index) => {
+        const ticketCard = document.createElement('div');
+        ticketCard.className = 'ticket-card';
+        ticketCard.id = `ticket-${ticket.id}`;
+        ticketCard.setAttribute('data-ticket-index', index);
+
+        // Ticket data for QR code
+        const qrData = JSON.stringify({
+            ticketId: ticket.id,
+            ticketType: ticket.name,
+            event: "Straight Outta Uni",
+            date: "2026-12-15",
+            time: "19:00",
+            location: "Grand Arena, Lagos",
+            customer: checkoutData.customer.name,
+            purchaseDate: new Date().toISOString(),
+            price: ticket.price,
+            type: ticket.type
+        });
+
+        ticketCard.innerHTML = `
+            <div class="ticket-header">
+                <div class="ticket-info">
+                    <h4>${ticket.name}</h4>
+                    <span class="ticket-type">${ticket.type === 'table' ? 'Table Reservation' : 'Ticket'}</span>
+                </div>
+                <div class="ticket-price">₦${ticket.price.toLocaleString()}</div>
+            </div>
+            <div class="ticket-id">ID: ${ticket.id}</div>
+            <div class="ticket-body">
+                <div class="ticket-qrcode" id="qrcode-${ticket.id}">
+                    <div style="padding: 20px; text-align: center; color: #666;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i>
+                        <div>Generating QR Code...</div>
+                    </div>
+                </div>
+                <div class="ticket-details">
+                    <div class="ticket-detail-row">
+                        <span>Event:</span>
+                        <span>Straight Outta Uni</span>
+                    </div>
+                    <div class="ticket-detail-row">
+                        <span>Date:</span>
+                        <span>Dec 15, 2026</span>
+                    </div>
+                    <div class="ticket-detail-row">
+                        <span>Time:</span>
+                        <span>7:00 PM - 2:00 AM</span>
+                    </div>
+                    <div class="ticket-detail-row">
+                        <span>Location:</span>
+                        <span>Grand Arena, Lagos</span>
+                    </div>
+                    <div class="ticket-detail-row">
+                        <span>Customer:</span>
+                        <span>${checkoutData.customer.name}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="ticket-actions">
+                <button class="btn btn-primary download-ticket-btn" data-ticket-id="${ticket.id}" data-ticket-index="${index}">
+                    <i class="fas fa-download"></i> Download Ticket
+                </button>
+                <button class="btn btn-outline share-ticket-btn" data-ticket-id="${ticket.id}">
+                    <i class="fas fa-share-alt"></i> Share
+                </button>
+            </div>
         `;
-    }
-    
-    // Update payment details
-    paymentDetails.innerHTML = `
-        <div style="margin-bottom: 20px;">
-            <p><strong>Order Reference:</strong> ${reference}</p>
-            ${paystackDetails}
+
+        ticketsContainer.appendChild(ticketCard);
+
+        // Generate QR code for this ticket
+        setTimeout(() => generateQRCodeForTicket(ticket.id, qrData), 100);
+    });
+
+    // Add event listeners to download buttons
+    setTimeout(() => {
+        document.querySelectorAll('.download-ticket-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const ticketId = this.getAttribute('data-ticket-id');
+                const index = this.getAttribute('data-ticket-index');
+                downloadTicket(ticketId, index);
+            });
+        });
+
+        document.querySelectorAll('.share-ticket-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const ticketId = this.getAttribute('data-ticket-id');
+                shareTicket(ticketId);
+            });
+        });
+    }, 500);
+
+    // Add ticket cards container to payment details
+    paymentDetails.appendChild(ticketsContainer);
+
+    // Add order summary section
+    const orderSummary = document.createElement('div');
+    orderSummary.style.marginTop = '30px';
+    orderSummary.innerHTML = `
+        <div style="background: #FEF2F2; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid rgba(220, 38, 38, 0.1);">
+            <h4 style="color: var(--primary); margin-bottom: 15px;">Order Summary</h4>
+            <p><strong>Payment Reference:</strong> ${reference}</p>
             <p><strong>Customer Name:</strong> ${checkoutData.customer.name}</p>
             <p><strong>Email:</strong> ${checkoutData.customer.email}</p>
-            <p><strong>Phone:</strong> ${checkoutData.customer.phone}</p>
             <p><strong>Total Paid:</strong> ₦${total.toLocaleString()}</p>
-            <p><strong>Payment Method:</strong> ${checkoutData.paymentMethod.charAt(0).toUpperCase() + checkoutData.paymentMethod.slice(1)}</p>
+            <p><strong>Number of Tickets:</strong> ${firestoreResult.ticketDetails.length}</p>
+            ${paystackResponse ? `<p><strong>Transaction ID:</strong> ${paystackResponse.transaction || 'N/A'}</p>` : ''}
         </div>
-        
-        <div style="background: rgba(220, 38, 38, 0.05); padding: 15px; border-radius: 8px; margin: 15px 0;">
-            <p style="color: var(--primary); font-weight: bold; margin-bottom: 10px;">🛒 Purchased Items:</p>
-            ${itemsDisplay}
-        </div>
-        
-        <div style="background: rgba(220, 38, 38, 0.05); padding: 15px; border-radius: 8px; margin: 15px 0;">
-            <p style="color: var(--primary); font-weight: bold; margin-bottom: 10px;">🎫 Your Ticket IDs:</p>
-            ${ticketIdsDisplay}
-            <p style="color: var(--primary-dark); margin-top: 10px; font-size: 13px;">
-                <strong>⚠️ Important:</strong> Save your ticket IDs! You'll need them for entry.
-                Check your email for full details with ticket types.
+        <div style="background: rgba(34, 197, 94, 0.1); padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="color: var(--success); margin: 0;">
+                <i class="fas fa-check-circle"></i> Confirmation email sent to ${checkoutData.customer.email}
             </p>
         </div>
-        
-        <div style="background: rgba(34, 197, 94, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
-            <p style="color: var(--success); font-weight: bold; margin-bottom: 5px;">
-                ✅ Confirmation email sent to ${checkoutData.customer.email}
-            </p>
-            <p style="color: var(--success-dark); font-size: 13px; margin: 0;">
-                Your email includes all ticket/table details, ticket IDs, and event information.
-            </p>
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn btn-outline" onclick="closeCheckoutModal()" style="padding: 12px 24px;">
+                <i class="fas fa-times"></i> Close
+            </button>
         </div>
     `;
-    
+
+    paymentDetails.appendChild(orderSummary);
+
     // Show success screen
     document.getElementById('step3Form').classList.remove('active');
     document.getElementById('paymentSuccess').classList.add('active');
 }
+
+
+
+
+// ============================================
+        // QR CODE GENERATION FUNCTION
+        // ============================================
+        function generateQRCodeForTicket(ticketId, qrData) {
+            const qrContainer = document.getElementById(`qrcode-${ticketId}`);
+            if (!qrContainer) {
+                console.error(`QR container not found: qrcode-${ticketId}`);
+                return;
+            }
+
+            // Clear any existing content
+            qrContainer.innerHTML = '';
+
+            try {
+                // Check if QRious is available
+                if (typeof QRious === 'undefined') {
+                    throw new Error('QRious library not loaded');
+                }
+
+                // Create a canvas element
+                const canvas = document.createElement('canvas');
+                canvas.id = `qr-canvas-${ticketId}`;
+                canvas.width = 180;
+                canvas.height = 180;
+                
+                // Generate QR code using QRious
+                const qr = new QRious({
+                    element: canvas,
+                    value: qrData,
+                    size: 180,
+                    level: 'H', // Error correction level: L, M, Q, H
+                    background: 'white',
+                    backgroundAlpha: 1,
+                    foreground: 'black',
+                    foregroundAlpha: 1
+                });
+
+                // Add canvas to container
+                qrContainer.appendChild(canvas);
+                console.log(`✅ QR code generated for ticket: ${ticketId}`);
+                
+            } catch (error) {
+                console.error('Error generating QR code:', error);
+                // Fallback: Show ticket ID if QR code fails
+                qrContainer.innerHTML = `
+                    <div style="color: var(--primary); text-align: center; padding: 20px;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">🎫</div>
+                        <div style="font-weight: bold; margin-bottom: 5px;">Ticket ID</div>
+                        <div style="font-family: monospace; font-size: 12px; word-break: break-all; background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                            ${ticketId}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+
+
+
+        // ============================================
+        // DOWNLOAD TICKET FUNCTION
+        // ============================================
+        async function downloadTicket(ticketId, index) {
+            const ticketElement = document.getElementById(`ticket-${ticketId}`);
+            if (!ticketElement) {
+                showNotification('Ticket not found');
+                return;
+            }
+
+            // Hide the action buttons before capturing
+            const buttonsContainer = ticketElement.querySelector('.ticket-actions');
+            const originalDisplay = buttonsContainer.style.display;
+            buttonsContainer.style.display = 'none';
+
+            // Add a download notice temporarily
+            const downloadNotice = document.createElement('div');
+            downloadNotice.innerHTML = '<div style="background: rgba(220, 38, 38, 0.1); padding: 10px; border-radius: 6px; margin: 10px 0; text-align: center; font-weight: 600; color: #DC2626;"><i class="fas fa-download"></i> Downloading Ticket...</div>';
+            ticketElement.insertBefore(downloadNotice, buttonsContainer);
+
+            try {
+                // Use html2canvas to capture the ticket (without buttons)
+                const canvas = await html2canvas(ticketElement, {
+                    backgroundColor: '#ffffff',
+                    scale: 2,
+                    logging: false,
+                    useCORS: true,
+                    removeContainer: true
+                });
+
+                // Convert canvas to data URL
+                const dataUrl = canvas.toDataURL('image/png', 1.0);
+
+                // Create download link
+                const link = document.createElement('a');
+                link.href = dataUrl;
+                link.download = `Straight_Outta_Uni_Ticket_${index + 1}_${ticketId.substring(0, 8)}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showNotification('Ticket downloaded successfully!');
+            } catch (error) {
+                console.error('Error downloading ticket:', error);
+                showNotification('Failed to download ticket. Please try again.');
+            } finally {
+                // Remove download notice
+                downloadNotice.remove();
+                
+                // Restore the buttons container
+                buttonsContainer.style.display = originalDisplay;
+            }
+        }
+
+
+        // ============================================
+        // SHARE TICKET FUNCTION (optional)
+        // ============================================
+        function shareTicket(ticketId) {
+            const ticketElement = document.getElementById(`ticket-${ticketId}`);
+            if (!ticketElement) return;
+
+            // For now, just copy ticket ID to clipboard
+            navigator.clipboard.writeText(ticketId)
+                .then(() => {
+                    showNotification('Ticket ID copied to clipboard!');
+                })
+                .catch(err => {
+                    console.error('Failed to copy:', err);
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = ticketId;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        showNotification('Ticket ID copied!');
+                    } catch (e) {
+                        showNotification('Failed to copy ticket ID.');
+                    }
+                    document.body.removeChild(textArea);
+                });
+        }
+
 
 // ============================================
 // UTILITY FUNCTIONS
@@ -978,15 +1205,35 @@ function verifyPaystack() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM fully loaded");
     
-    // Verify Paystack is loaded
-    setTimeout(verifyPaystack, 1000);
+    // Check if QRious library is loaded
+    if (typeof QRious === 'undefined') {
+        console.error("QRious library not loaded!");
+        // Try to load it dynamically if not loaded
+        loadQRiousLibrary();
+    } else {
+        console.log("✅ QRious library loaded successfully");
+    }
     
-    // Initialize app
     init();
 });
+
+// Dynamic library loading as fallback
+function loadQRiousLibrary() {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js';
+    script.onload = function() {
+        console.log("✅ QRious library loaded dynamically");
+    };
+    script.onerror = function() {
+        console.error("Failed to load QRious library");
+    };
+    document.head.appendChild(script);
+}
 
 // Make functions globally available
 window.addToCart = addToCart;
 window.removeFromCart = removeFromCart;
 window.updateQuantity = updateQuantity;
 window.scrollToTickets = scrollToTickets;
+window.downloadTicket = downloadTicket;
+window.shareTicket = shareTicket;
