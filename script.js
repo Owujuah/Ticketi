@@ -446,9 +446,9 @@ async function saveCustomerToFirestore(customerData, orderData, paymentReference
                     purchaseDate: firebase.firestore.FieldValue.serverTimestamp(),
                     paymentReference: paymentReference,
                     status: 'valid',
-                    eventDate: '2026-12-15',
-                    eventTime: '19:00',
-                    eventLocation: 'Grand Arena, Lagos',
+                    eventDate: 'Coming soon',
+                    eventTime: '4:30',
+                    eventLocation: 'Event 45, Calabar',
                     itemType: item.type,
                     quantity: 1,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -878,9 +878,9 @@ function showPaymentSuccess(reference, firestoreResult, paystackResponse = null)
             ticketId: ticket.id,
             ticketType: ticket.name,
             event: "Straight Outta Uni",
-            date: "2026-12-15",
-            time: "19:00",
-            location: "Grand Arena, Lagos",
+            date: "Coming Soon",
+            time: "4:30pm",
+            location: "Event 45, Calabar",
             customer: checkoutData.customer.name,
             purchaseDate: new Date().toISOString(),
             price: ticket.price,
@@ -910,15 +910,15 @@ function showPaymentSuccess(reference, firestoreResult, paystackResponse = null)
                     </div>
                     <div class="ticket-detail-row">
                         <span>Date:</span>
-                        <span>Dec 15, 2026</span>
+                        <span>Coming Soon</span>
                     </div>
                     <div class="ticket-detail-row">
                         <span>Time:</span>
-                        <span>7:00 PM - 2:00 AM</span>
+                        <span>4:30 - Dawn</span>
                     </div>
                     <div class="ticket-detail-row">
                         <span>Location:</span>
-                        <span>Grand Arena, Lagos</span>
+                        <span>Event 45, Calabar</span>
                     </div>
                     <div class="ticket-detail-row">
                         <span>Customer:</span>
