@@ -1721,6 +1721,7 @@ footer {
     }
     .ticket-card {
         padding: 20px;
+        margin-left: -20%;
     }
     .ticket-header {
         flex-direction: column;
